@@ -33,7 +33,7 @@ const EmoAI = () => {
 
         try {
             // Step 1: Send the pre-recorded prompt to Cohere API
-            const preRecordedPrompt = `write a very short Promt to generate music emotion ${currentEmotion}`;
+            const preRecordedPrompt = `write a IMPORTANT(very short) Promt to generate music emotion ${currentEmotion}`;
             const cohereResponse = await axios.post('http://localhost:3000/chat', { prompt: preRecordedPrompt });
             const chatgptResponse = cohereResponse.data.response;
             console.log('Cohere API Response:', chatgptResponse);
@@ -43,10 +43,6 @@ const EmoAI = () => {
                 prompt: chatgptResponse,
                 wait_audio: waitAudio
             });
-
-            // if (!sunoApiResponse.ok) {
-            //     throw new Error('Failed to generate audio');
-            // }
 
             const data = sunoApiResponse.data;
             console.log('SunoApi Response:', data);
@@ -61,7 +57,6 @@ const EmoAI = () => {
             console.error('Error processing prompt:', error);
         }
     };
-
 
     const handleChange = (event) => {
         setPrompt(event.target.value);
@@ -150,7 +145,6 @@ const EmoAI = () => {
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
-
                         <form onSubmit={handleSubmit} className="form-container">
                             <label className="block mt-4">
                                 <input
@@ -164,14 +158,12 @@ const EmoAI = () => {
                             <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
                                 Generate Music
                             </button>
-
                         </form>
                         <div className="waveform"></div>
                         {generatedAudio.length > 0 && (
                             <div className="mt-4">
                                 <h2>Generated Audio:</h2>
                                 <ul>
-                                    {/* Используйте generatedAudio[0], чтобы получить первый элемент массива */}
                                     <li key={generatedAudio[0].id || 0}>
                                         <p>Title: {generatedAudio[0].title}</p>
                                         <audio controls>
@@ -182,7 +174,6 @@ const EmoAI = () => {
                                 </ul>
                             </div>
                         )}
-
                         <input type="range" className="slider" />
                         <div className="controls">
                             <button onClick={togglePlay}>
@@ -208,7 +199,7 @@ const EmoAI = () => {
                 <div className="relative flex items-center justify-center w-full max-w-sm md:max-w-md lg:max-w-lg p-8 rounded-lg">
                     {accessWebcam ? (
                         <>
-                            {!isMenuOpen && (
+                            <div className={`video-container ${isMenuOpen ? 'hidden' : 'block'}`}>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                                     <div ref={videoContainerRef} style={{ position: "relative", overflow: "hidden", width: "100%", paddingTop: "100%" }}>
                                         <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>
@@ -217,8 +208,7 @@ const EmoAI = () => {
                                     <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
                                     <hr className="solid" style={{ width: "100%" }}></hr>
                                 </div>
-                            )
-                             }
+                            </div>
                         </>
                     ) : (
                         <>

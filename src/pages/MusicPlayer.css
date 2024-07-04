@@ -62,6 +62,15 @@
     border-radius: 50%;
 }
 
+.hidden {
+    display: none;
+}
+
+.block {
+    display: block;
+}
+
+
 .music-player .slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
