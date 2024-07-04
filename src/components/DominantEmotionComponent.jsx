@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 const musicMap = {
   Happy: "/music/Weekend-Happy.mp3",
   Sad: "/music/XXXTENTACION - sad.mp3",
-  Surprise: "/music/SmackThat-surpise.mp3",
+  Surprise: "/music/One.mp3",
   Neutral: "/music/idea10-neutral.mp3",
   Angry: "/music/MeadnDevil-Fear.mp3",
   Disgust: "/music/Eminem - Mockingbird.mp3"
