@@ -22,7 +22,7 @@ const GenderComponent = () => {
     if (!isPaused) {
       bindEvents();
       intervalRef.current = setInterval(() => {
-        console.log("Updating dominantEmotion and audioSource");
+        // console.log("Updating dominantEmotion and audioSource");
         // Обновляем только если emotionBuffer отличается от текущей dominantEmotion
         if (dominantEmotion !== emotionBuffer) {
           setDominantEmotion(emotionBuffer);
