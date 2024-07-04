@@ -28,7 +28,7 @@ const GenderComponent = () => {
           setDominantEmotion(emotionBuffer);
           setAudioSource(musicMap[emotionBuffer] || musicMap["Neutral"]);
         }
-      }, 5000);
+      }, 3000);
     }
 
     return () => {
