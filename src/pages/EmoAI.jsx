@@ -33,14 +33,14 @@ const EmoAI = () => {
 
         try {
             // Step 1: Send the pre-recorded prompt to Cohere API
-            const preRecordedPrompt = `write a IMPORTANT(very short) Promt to generate music emotion ${currentEmotion}`;
-            const cohereResponse = await axios.post('https://facetune-back.onrender.com/chat', { prompt: preRecordedPrompt });
-            const chatgptResponse = cohereResponse.data.response;
-            console.log('Cohere API Response:', chatgptResponse);
+            // const preRecordedPrompt = `write a IMPORTANT(very short) Promt to generate music emotion ${currentEmotion}`;
+            // const cohereResponse = await axios.post('https://facetune-back.onrender.com/chat', { prompt: preRecordedPrompt });
+            // const chatgptResponse = cohereResponse.data.response;
+            // console.log('Cohere API Response:', chatgptResponse);
 
             // Step 2: Send the processed prompt to SunoApi for audio generation
             const sunoApiResponse = await axios.post('https://facetune-back.onrender.com/api/generate', {
-                prompt: chatgptResponse,
+                prompt: "I feel surprised",
                 wait_audio: waitAudio
             });
 
