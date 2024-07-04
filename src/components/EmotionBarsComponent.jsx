@@ -5,6 +5,7 @@ import DominantEmotionComponent from "./DominantEmotionComponent.jsx";
 
 
 const EmotionBarsComponent = () => {
+    const [showGenderComponent, setShowGenderComponent] = useState(true);
     const [angry, setAngry] = useState(0);
     const [disgust, setDisgust] = useState(0);
     const [fear, setFear] = useState(0);
