@@ -117,6 +117,22 @@ const EmoAI = () => {
                 <a className="block w-[12rem] xl:mr-28" href="#">
                     <img src={logo} width={190} height={40} alt="FaceTune.ai" />
                 </a>
+
+                <form onSubmit={handleSubmit} className="form-container">
+                    <label className="block mt-4">
+                        <input
+                            type="checkbox"
+                            checked={waitAudio}
+                            onChange={handleWaitAudioChange}
+                            className="mr-2"
+                        />
+                        Wait for audio
+                    </label>
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                        Generate Music
+                    </button>
+                </form>
+
                 <div className="space-y-2">
                     <h2 className="text-xl font-bold">Current Emotion</h2>
                     <div className="bg-EmoButton p-4 rounded-lg">
@@ -145,20 +161,6 @@ const EmoAI = () => {
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
-                        <form onSubmit={handleSubmit} className="form-container">
-                            <label className="block mt-4">
-                                <input
-                                    type="checkbox"
-                                    checked={waitAudio}
-                                    onChange={handleWaitAudioChange}
-                                    className="mr-2"
-                                />
-                                Wait for audio
-                            </label>
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                                Generate Music
-                            </button>
-                        </form>
                         <div className="waveform"></div>
                         {generatedAudio.length > 0 && (
                             <div className="mt-4">
