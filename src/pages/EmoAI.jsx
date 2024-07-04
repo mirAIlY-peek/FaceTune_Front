@@ -191,7 +191,7 @@ const EmoAI = () => {
                 {isMenuOpen ? "Close" : "Menu"}
             </button>
 
-            <div className={`transition-all duration-300 lg:col-span-3 p-4 flex flex-col items-center justify-center ${isMenuOpen ? "ml-0" : "ml-auto"} ${isMenuOpen ? "w-full" : "lg:w-3/4"} ${!isMenuOpen && "lg:ml-0 lg:w-full"}`}>
+            <div className={`transition-all duration-300 lg:col-span-3 flex flex-col items-center justify-center ${isMenuOpen ? "ml-0" : "ml-auto"} ${isMenuOpen ? "w-full" : "lg:w-3/4"} ${!isMenuOpen && "lg:ml-0 lg:w-full"}`}>
                 <h2 className="text-3xl font-bold mb-4">Emotion Analysis</h2>
                 <p className="mb-4">
                     Allow access to your webcam to capture your face and analyze your emotions in real-time
