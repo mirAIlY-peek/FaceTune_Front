@@ -202,7 +202,7 @@ const EmoAI = () => {
                             <div className={`video-container ${isMenuOpen ? 'hidden' : 'block'}`}>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                                     <div ref={videoContainerRef} style={{ position: "relative", overflow: "hidden", width: "100%", paddingTop: "100%" }}>
-                                        {/*<video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>*/}
+                                        <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>
                                         <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
                                     </div>
                                     <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
