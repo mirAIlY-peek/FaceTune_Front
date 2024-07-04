@@ -196,7 +196,7 @@ const EmoAI = () => {
                 <p className="mb-4">
                     Allow access to your webcam to capture your face and analyze your emotions in real-time
                 </p>
-                <div className="relative flex items-center justify-center w-full max-w-sm md:max-w-md lg:max-w-lg p-8 rounded-lg">
+                <div className="relative flex items-center justify-center w-full max-w-sm md:max-w-md lg:max-w-lg  rounded-lg">
                     {accessWebcam ? (
                         <>
                             <div className={`video-container ${isMenuOpen ? 'hidden' : 'block'}`}>
