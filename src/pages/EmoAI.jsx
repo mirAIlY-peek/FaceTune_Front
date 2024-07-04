@@ -6,6 +6,7 @@ import { useExternalScript } from "../helpers/ai-sdk/externalScriptsLoader.js";
 import { getAiSdkControls } from "../helpers/ai-sdk/loader.js";
 import FaceTrackerComponent from "../components/FaceTrackerComponent.jsx";
 import EmotionBarsComponent from "../components/EmotionBarsComponent.jsx";
+import axios from 'axios';
 
 const EmoAI = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +23,21 @@ const EmoAI = () => {
     const [waitAudio, setWaitAudio] = useState(false);
     const [currentEmotion, setCurrentEmotion] = useState(null); // State to track current detected emotion
 
+    const handleSubmitsСohere = async (inputPrompt) => {
+        if (!inputPrompt.trim()) return;
+        try {
+            setPrompt('');
+            const res = await axios.post('http://localhost:3000/chat', { prompt: inputPrompt });
+            const chatgptResponse = res.data.response;
+            console.log('API Response:', chatgptResponse);  // Log response to console
+
+        } catch (error) {
+            console.error('Error fetching response:', error);
+        }
+    };
+
+
+
     const handleEmotionUpdate = (emotion) => {
         // Logic to determine the most expressed emotion
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
@@ -32,7 +48,7 @@ const EmoAI = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch(`http://localhost:3000/api/generate?timestamp=${Date.now()}`, {
+            const response = await fetch(`http://localhost:3000/api/generate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -45,13 +61,13 @@ const EmoAI = () => {
             }
 
             const data = await response.json();
-            console.log('Previous audio data:', generatedAudio);
             console.log('Received new data:', data);
             setGeneratedAudio(data);
         } catch (error) {
             console.error('Error generating audio:', error);
         }
     };
+
 
     const handleChange = (event) => {
         setPrompt(event.target.value);
@@ -131,6 +147,20 @@ const EmoAI = () => {
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
+                        <div>
+                            <form onSubmit={e => {
+                                e.preventDefault();
+                                handleSubmitsСohere(prompt);
+                            }}>
+                                <input
+                                    type="text"
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    placeholder="Enter your message"
+                                />
+                                <button type="submit">Send</button>
+                            </form>
+                        </div>
                         {/* Waveform */}
                         <div className="waveform"></div>
                         {/* Slider */}
@@ -165,47 +195,47 @@ const EmoAI = () => {
                                 <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>
                                 <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
                             </div>
-                            {/*<EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>*/}
-                            {/*<hr className="solid" style={{ width: "100%" }}></hr>*/}
+                            <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
+                            <hr className="solid" style={{ width: "100%" }}></hr>
 
-                            {/*<form onSubmit={handleSubmit} className="form-container">*/}
-                            {/*    <textarea*/}
-                            {/*        value={prompt}*/}
-                            {/*        onChange={handleChange}*/}
-                            {/*        placeholder="Enter your music prompt..."*/}
-                            {/*        rows={4}*/}
-                            {/*        className="border p-2 w-full"*/}
-                            {/*    />*/}
-                            {/*    <label className="block mt-4">*/}
-                            {/*        <input*/}
-                            {/*            type="checkbox"*/}
-                            {/*            checked={waitAudio}*/}
-                            {/*            onChange={handleWaitAudioChange}*/}
-                            {/*            className="mr-2"*/}
-                            {/*        />*/}
-                            {/*        Wait for audio*/}
-                            {/*    </label>*/}
-                            {/*    <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">*/}
-                            {/*        Generate Music*/}
-                            {/*    </button>*/}
+                            <form onSubmit={handleSubmit} className="form-container">
+                                <textarea
+                                    value={prompt}
+                                    onChange={handleChange}
+                                    placeholder="Enter your music prompt..."
+                                    rows={4}
+                                    className="border p-2 w-full"
+                                />
+                                <label className="block mt-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={waitAudio}
+                                        onChange={handleWaitAudioChange}
+                                        className="mr-2"
+                                    />
+                                    Wait for audio
+                                </label>
+                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                                    Generate Music
+                                </button>
 
-                            {/*    {generatedAudio.length > 0 && (*/}
-                            {/*        <div className="mt-4">*/}
-                            {/*            <h2>Generated Audio:</h2>*/}
-                            {/*            <ul>*/}
-                            {/*                {generatedAudio.map((audio, index) => (*/}
-                            {/*                    <li key={audio.id || index}>*/}
-                            {/*                        <p>Title: {audio.title}</p>*/}
-                            {/*                        <audio controls>*/}
-                            {/*                            <source key={audio.audio_url} src={audio.audio_url} type="audio/mpeg" />*/}
-                            {/*                            Your browser does not support the audio element.*/}
-                            {/*                        </audio>*/}
-                            {/*                    </li>*/}
-                            {/*                ))}*/}
-                            {/*            </ul>*/}
-                            {/*        </div>*/}
-                            {/*    )}*/}
-                            {/*</form>*/}
+                                {generatedAudio.length > 0 && (
+                                    <div className="mt-4">
+                                        <h2>Generated Audio:</h2>
+                                        <ul>
+                                            {generatedAudio.map((audio, index) => (
+                                                <li key={audio.id || index}>
+                                                    <p>Title: {audio.title}</p>
+                                                    <audio controls>
+                                                        <source key={audio.audio_url} src={audio.audio_url} type="audio/mpeg" />
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </form>
                         </div>
                     ) : (
                         <>
