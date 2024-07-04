@@ -12,7 +12,7 @@ const EmoAI = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
-    const [accessWebcam, setAccessWebcam] = useState(false); // State to track webcam access
+    const [accessWebcam, setAccessWebcam] = useState(false);
     const mphToolsState = useExternalScript("https://sdk.morphcast.com/mphtools/v1.0/mphtools.js");
     const aiSdkState = useExternalScript("https://ai-sdk.morphcast.com/v1.16/ai-sdk.js");
     const videoContainerRef = useRef(null);
@@ -21,50 +21,44 @@ const EmoAI = () => {
     const [generatedAudio, setGeneratedAudio] = useState([]);
     const [prompt, setPrompt] = useState('');
     const [waitAudio, setWaitAudio] = useState(false);
-    const [currentEmotion, setCurrentEmotion] = useState(null); // State to track current detected emotion
-
-    const handleSubmitsСohere = async (inputPrompt) => {
-        if (!inputPrompt.trim()) return;
-        try {
-            setPrompt('');
-            const res = await axios.post('http://localhost:3000/chat', { prompt: inputPrompt });
-            const chatgptResponse = res.data.response;
-            console.log('API Response:', chatgptResponse);  // Log response to console
-
-        } catch (error) {
-            console.error('Error fetching response:', error);
-        }
-    };
-
-
+    const [currentEmotion, setCurrentEmotion] = useState(null);
 
     const handleEmotionUpdate = (emotion) => {
-        // Logic to determine the most expressed emotion
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
         setCurrentEmotion(maxEmotion);
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent the default form submission behavior
 
         try {
-            const response = await fetch(`http://localhost:3000/api/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt, wait_audio: waitAudio })
+            // Step 1: Send the pre-recorded prompt to Cohere API
+            const preRecordedPrompt = `write a very short Promt to generate music emotion ${currentEmotion}`;
+            const cohereResponse = await axios.post('http://localhost:3000/chat', { prompt: preRecordedPrompt });
+            const chatgptResponse = cohereResponse.data.response;
+            console.log('Cohere API Response:', chatgptResponse);
+
+            // Step 2: Send the processed prompt to SunoApi for audio generation
+            const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
+                prompt: chatgptResponse,
+                wait_audio: waitAudio
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to generate audio');
-            }
+            // if (!sunoApiResponse.ok) {
+            //     throw new Error('Failed to generate audio');
+            // }
 
-            const data = await response.json();
-            console.log('Received new data:', data);
+            const data = sunoApiResponse.data;
+            console.log('SunoApi Response:', data);
             setGeneratedAudio(data);
+
+            // Play the generated audio
+            if (data.length > 0) {
+                const audioElement = new Audio(data[0].audio_url); // Example: select the first element
+                audioElement.play();
+            }
         } catch (error) {
-            console.error('Error generating audio:', error);
+            console.error('Error processing prompt:', error);
         }
     };
 
@@ -93,7 +87,6 @@ const EmoAI = () => {
 
     useEffect(() => {
         const emotionUpdateHandler = (evt) => {
-            // Extract emotions from event detail
             const emotions = evt.detail.output.emotion;
             handleEmotionUpdate(emotions);
         };
@@ -125,7 +118,6 @@ const EmoAI = () => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-screen bg-emoR text-white">
-            {/* Left static part */}
             <div className={`fixed lg:relative bg-emo p-4 flex flex-col space-y-8 transition-transform transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
                 <a className="block w-[12rem] xl:mr-28" href="#">
                     <img src={logo} width={190} height={40} alt="FaceTune.ai" />
@@ -134,36 +126,63 @@ const EmoAI = () => {
                     <h2 className="text-xl font-bold">Current Emotion</h2>
                     <div className="bg-EmoButton p-4 rounded-lg">
                         <h3 className="text-yellow-500 text-2xl font-bold">{currentEmotion}</h3>
-                        <p>Your emotions is currently detected as {currentEmotion}</p>
+                        <p>Your emotion is currently detected as {currentEmotion}</p>
                     </div>
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-xl font-bold">Recommended Music</h2>
                     <div className="bg-EmoButton p-4 rounded-lg">
-                        <h3 className="text-purple-500 text-2xl font-bold">Upbeat Pop</h3>
-                        <p>Energetic and cheerful music to match your happy mood</p>
+                        {generatedAudio.length > 0 && (
+                            <ul>
+                                <li key={generatedAudio[0].id || 0} className="music-item flex items-center space-x-4">
+                                    {generatedAudio[0].image_url && (
+                                        <img src={generatedAudio[0].image_url} alt={`Cover art for ${generatedAudio[0].title}`} className="w-16 h-16 object-cover" />
+                                    )}
+                                    <div>
+                                        <h3 className="text-purple-500 text-xl font-bold">{generatedAudio[0].title}</h3>
+                                        <p>Tags: {generatedAudio[0].tags}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        )}
                     </div>
                 </div>
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
-                        {/*<div>*/}
-                        {/*    <form onSubmit={e => {*/}
-                        {/*        e.preventDefault();*/}
-                        {/*        handleSubmitsСohere(prompt);*/}
-                        {/*    }}>*/}
-                        {/*        <input*/}
-                        {/*            type="text"*/}
-                        {/*            value={prompt}*/}
-                        {/*            onChange={(e) => setPrompt(e.target.value)}*/}
-                        {/*            placeholder="Enter your message"*/}
-                        {/*        />*/}
-                        {/*        <button type="submit">Send</button>*/}
-                        {/*    </form>*/}
-                        {/*</div>*/}
-                        {/* Waveform */}
+
+                        <form onSubmit={handleSubmit} className="form-container">
+                            <label className="block mt-4">
+                                <input
+                                    type="checkbox"
+                                    checked={waitAudio}
+                                    onChange={handleWaitAudioChange}
+                                    className="mr-2"
+                                />
+                                Wait for audio
+                            </label>
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                                Generate Music
+                            </button>
+
+                        </form>
                         <div className="waveform"></div>
-                        {/* Slider */}
+                        {generatedAudio.length > 0 && (
+                            <div className="mt-4">
+                                <h2>Generated Audio:</h2>
+                                <ul>
+                                    {/* Используйте generatedAudio[0], чтобы получить первый элемент массива */}
+                                    <li key={generatedAudio[0].id || 0}>
+                                        <p>Title: {generatedAudio[0].title}</p>
+                                        <audio controls>
+                                            <source key={generatedAudio[0].audio_url} src={generatedAudio[0].audio_url} type="audio/mpeg" />
+                                            Ваш браузер не поддерживает элемент audio.
+                                        </audio>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
+
                         <input type="range" className="slider" />
                         <div className="controls">
                             <button onClick={togglePlay}>
@@ -177,12 +196,10 @@ const EmoAI = () => {
                 </div>
             </div>
 
-            {/* Button to open the menu on mobile devices */}
             <button className="fixed top-4 left-4 lg:hidden bg-gray-700 p-2 rounded-lg z-20" onClick={toggleMenu}>
                 {isMenuOpen ? "Close" : "Menu"}
             </button>
 
-            {/* Right dynamic part */}
             <div className={`transition-all duration-300 lg:col-span-3 p-4 flex flex-col items-center justify-center ${isMenuOpen ? "ml-0" : "ml-auto"} ${isMenuOpen ? "w-full" : "lg:w-3/4"} ${!isMenuOpen && "lg:ml-0 lg:w-full"}`}>
                 <h2 className="text-3xl font-bold mb-4">Emotion Analysis</h2>
                 <p className="mb-4">
@@ -190,60 +207,24 @@ const EmoAI = () => {
                 </p>
                 <div className="relative flex items-center justify-center w-full max-w-sm md:max-w-md lg:max-w-lg p-8 rounded-lg">
                     {accessWebcam ? (
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-                            <div ref={videoContainerRef} style={{ position: "relative", overflow: "hidden", width: "100%", paddingTop: "100%" }}>
-                                <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>
-                                <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
-                            </div>
-                            <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
-                            <hr className="solid" style={{ width: "100%" }}></hr>
-
-                            <form onSubmit={handleSubmit} className="form-container">
-                                <textarea
-                                    value={prompt}
-                                    onChange={handleChange}
-                                    placeholder="Enter your music prompt..."
-                                    rows={4}
-                                    className="border p-2 w-full"
-                                />
-                                <label className="block mt-4">
-                                    <input
-                                        type="checkbox"
-                                        checked={waitAudio}
-                                        onChange={handleWaitAudioChange}
-                                        className="mr-2"
-                                    />
-                                    Wait for audio
-                                </label>
-                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                                    Generate Music
-                                </button>
-
-                                {generatedAudio.length > 0 && (
-                                    <div className="mt-4">
-                                        <h2>Generated Audio:</h2>
-                                        <ul>
-                                            {generatedAudio.map((audio, index) => (
-                                                <li key={audio.id || index}>
-                                                    <p>Title: {audio.title}</p>
-                                                    <audio controls>
-                                                        <source key={audio.audio_url} src={audio.audio_url} type="audio/mpeg" />
-                                                        Your browser does not support the audio element.
-                                                    </audio>
-                                                </li>
-                                            ))}
-                                        </ul>
+                        <>
+                            {!isMenuOpen && (
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+                                    <div ref={videoContainerRef} style={{ position: "relative", overflow: "hidden", width: "100%", paddingTop: "100%" }}>
+                                        <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}></video>
+                                        <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
                                     </div>
-                                )}
-                            </form>
-                        </div>
+                                    <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
+                                    <hr className="solid" style={{ width: "100%" }}></hr>
+                                </div>
+                            )
+                             }
+                        </>
                     ) : (
                         <>
-                            {/* Conditional rendering for FaceToEmo image */}
                             {!isMenuOpen && (
                                 <img src="/faceToEmo.png" alt="Face Outline" className="w-full h-auto relative z-0" />
                             )}
-                            {/* Conditional rendering for Access WebCam button */}
                             {!isMenuOpen && (
                                 <div className="absolute inset-0 flex items-center justify-center z-10">
                                     <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>Access WebCam</button>

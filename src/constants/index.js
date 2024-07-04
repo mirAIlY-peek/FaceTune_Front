@@ -89,38 +89,39 @@ export const brainwaveServicesIcons = [
 export const roadmap = [
   {
     id: "0",
-    title: "Voice recognition",
-    text: "Enable the chatbot to understand and respond to voice commands, making it easier for users to interact with the app hands-free.",
+    title: "Facial Emotion Recognition",
+    text: "Implement machine learning to detect and analyze facial expressions in real-time, enabling the app to generate music based on detected emotions or suggest appropriate tracks from the user's playlist.",
     date: "May 2023",
-    status: "done",
+    status: "progress",
     imageUrl: roadmap1,
     colorful: true,
   },
   {
     id: "1",
     title: "Gamification",
-    text: "Add game-like elements, such as badges or leaderboards, to incentivize users to engage with the chatbot more frequently.",
+    text: "Incorporate game-like elements such as badges or leaderboards to encourage user engagement with the emotion-based music generation feature.",
     date: "May 2023",
     status: "progress",
     imageUrl: roadmap2,
   },
   {
     id: "2",
-    title: "Chatbot customization",
-    text: "Allow users to customize the chatbot's appearance and behavior, making it more engaging and fun to interact with.",
+    title: "Customizable Music Experience",
+    text: "Allow users to personalize their music experience by customizing how the app responds to different emotional cues detected through facial recognition.",
     date: "May 2023",
-    status: "done",
+    status: "progress",
     imageUrl: roadmap3,
   },
   {
     id: "3",
-    title: "Integration with APIs",
-    text: "Allow the chatbot to access external data sources, such as weather APIs or news APIs, to provide more relevant recommendations.",
+    title: "Integration with Music APIs",
+    text: "Integrate with music APIs to access user playlists and recommend music tracks based on detected emotions, enhancing the personalized music experience.",
     date: "May 2023",
     status: "progress",
     imageUrl: roadmap4,
   },
 ];
+
 
 export const collabText =
   "With smart automation and top-notch security, it's the perfect solution for teams looking to work smarter.";
@@ -210,6 +211,7 @@ export const pricing = [
       "An AI chatbot that can understand your queries",
       "Personalized recommendations based on your preferences",
       "Ability to explore the app and its features without any cost",
+      "Music selection from your own playlist",
     ],
   },
   {
@@ -221,20 +223,24 @@ export const pricing = [
       "An advanced AI chatbot that can understand complex queries",
       "An analytics dashboard to track your conversations",
       "Priority support to solve issues quickly",
+      "Music generation based on detected emotions",
     ],
   },
   {
     id: "2",
     title: "Enterprise",
     description: "Custom AI chatbot, advanced analytics, dedicated account",
-    price: null,
+    price: "19.99",
     features: [
-      "An AI chatbot that can understand your queries",
-      "Personalized recommendations based on your preferences",
-      "Ability to explore the app and its features without any cost",
+      "A customizable AI chatbot tailored to your specific needs",
+      "Advanced analytics for detailed insights",
+      "Dedicated account manager for personalized support",
+      "Enhanced music generation capabilities based on facial emotion recognition",
     ],
   },
 ];
+
+
 
 export const benefits = [
   {
