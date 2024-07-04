@@ -147,20 +147,20 @@ const EmoAI = () => {
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
-                        <div>
-                            <form onSubmit={e => {
-                                e.preventDefault();
-                                handleSubmitsСohere(prompt);
-                            }}>
-                                <input
-                                    type="text"
-                                    value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                    placeholder="Enter your message"
-                                />
-                                <button type="submit">Send</button>
-                            </form>
-                        </div>
+                        {/*<div>*/}
+                        {/*    <form onSubmit={e => {*/}
+                        {/*        e.preventDefault();*/}
+                        {/*        handleSubmitsСohere(prompt);*/}
+                        {/*    }}>*/}
+                        {/*        <input*/}
+                        {/*            type="text"*/}
+                        {/*            value={prompt}*/}
+                        {/*            onChange={(e) => setPrompt(e.target.value)}*/}
+                        {/*            placeholder="Enter your message"*/}
+                        {/*        />*/}
+                        {/*        <button type="submit">Send</button>*/}
+                        {/*    </form>*/}
+                        {/*</div>*/}
                         {/* Waveform */}
                         <div className="waveform"></div>
                         {/* Slider */}
