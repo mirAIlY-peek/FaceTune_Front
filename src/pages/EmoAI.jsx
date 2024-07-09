@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import Loader from '../components/Loader.jsx'; // Import the loader component
 import { logo } from "../assets/index.js";
 import { HiPlay, HiPause, HiVolumeUp, HiVolumeOff } from "react-icons/hi";
 import './MusicPlayer.css';
@@ -22,6 +23,7 @@ const EmoAI = () => {
     const [prompt, setPrompt] = useState('');
     const [waitAudio, setWaitAudio] = useState(false);
     const [currentEmotion, setCurrentEmotion] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
     const handleEmotionUpdate = (emotion) => {
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
@@ -32,14 +34,10 @@ const EmoAI = () => {
         event.preventDefault(); // Prevent the default form submission behavior
 
         try {
-            // Step 1: Send the pre-recorded prompt to Cohere API
-            // const preRecordedPrompt = `write a IMPORTANT(very short) Promt to generate music emotion ${currentEmotion}`;
-            // const cohereResponse = await axios.post('https://facetune-back.onrender.com/chat', { prompt: preRecordedPrompt });
-            // const chatgptResponse = cohereResponse.data.response;
-            // console.log('Cohere API Response:', chatgptResponse);
+            setIsLoading(true); // Set loading state to true
 
             // Step 2: Send the processed prompt to SunoApi for audio generation
-            const sunoApiResponse = await axios.post('https://facetune-back.onrender.com/api/generate', {
+            const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
                 prompt: "I feel surprised",
                 wait_audio: waitAudio
             });
@@ -55,6 +53,8 @@ const EmoAI = () => {
             }
         } catch (error) {
             console.error('Error processing prompt:', error);
+        } finally {
+            setIsLoading(false); // Set loading state to false after API call completes
         }
     };
 
@@ -117,21 +117,26 @@ const EmoAI = () => {
                 <a className="block w-[12rem] xl:mr-28" href="#">
                     <img src={logo} width={190} height={40} alt="FaceTune.ai" />
                 </a>
+                {!isLoading && (
+                    <form onSubmit={handleSubmit} className="form-container">
+                        <label className="block mt-4">
+                            <input
+                                type="checkbox"
+                                checked={waitAudio}
+                                onChange={handleWaitAudioChange}
+                                className="mr-2"
+                            />
+                            Wait for audio
+                        </label>
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                            Generate Music
+                        </button>
+                    </form>
+                )}
 
-                <form onSubmit={handleSubmit} className="form-container">
-                    <label className="block mt-4">
-                        <input
-                            type="checkbox"
-                            checked={waitAudio}
-                            onChange={handleWaitAudioChange}
-                            className="mr-2"
-                        />
-                        Wait for audio
-                    </label>
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                        Generate Music
-                    </button>
-                </form>
+                {/* Загрузчик, отображаемый во время загрузки */}
+                {isLoading && <Loader />}
+
 
                 <div className="space-y-2">
                     <h2 className="text-xl font-bold">Current Emotion</h2>
@@ -170,7 +175,7 @@ const EmoAI = () => {
                                         <p>Title: {generatedAudio[0].title}</p>
                                         <audio controls>
                                             <source key={generatedAudio[0].audio_url} src={generatedAudio[0].audio_url} type="audio/mpeg" />
-                                            Ваш браузер не поддерживает элемент audio.
+                                            Your browser does not support the audio element.
                                         </audio>
                                     </li>
                                 </ul>
@@ -204,7 +209,7 @@ const EmoAI = () => {
                             <div className={`video-container ${isMenuOpen ? 'hidden' : 'block'}`}>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                                     <div ref={videoContainerRef} style={{ position: "relative", overflow: "hidden", width: "100%", paddingTop: "100%" }}>
-                                        <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }} playsInline></video>
+                                        <video id="videoEl" autoPlay style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0, transform: "scaleX(-1)" }} playsInline></video>
                                         <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
                                     </div>
                                     <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
