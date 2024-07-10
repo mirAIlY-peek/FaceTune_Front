@@ -21,7 +21,7 @@ const EmoAI = () => {
 
     const [generatedAudio, setGeneratedAudio] = useState([]);
     const [prompt, setPrompt] = useState('');
-    const [waitAudio, setWaitAudio] = useState(false);
+    // const [waitAudio, setWaitAudio] = useState(false);
     const [currentEmotion, setCurrentEmotion] = useState(null);
     const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
@@ -39,7 +39,7 @@ const EmoAI = () => {
             // Step 2: Send the processed prompt to SunoApi for audio generation
             const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
                 prompt: "I feel surprised",
-                wait_audio: waitAudio
+                wait_audio: true
             });
 
             const data = sunoApiResponse.data;
@@ -58,13 +58,14 @@ const EmoAI = () => {
         }
     };
 
-    const handleChange = (event) => {
-        setPrompt(event.target.value);
-    };
+    // const handleChange = (event) => {
+    //     setPrompt(event.target.value);
+    // };
 
-    const handleWaitAudioChange = (event) => {
-        setWaitAudio(event.target.checked);
-    };
+    // const handleWaitAudioChange = (event) => {
+    //     setWaitAudio(event.target.checked);
+    //     console.log(event.target.checked)
+    // };
 
     useEffect(() => {
         videoEl.current = document.getElementById("videoEl");
@@ -112,27 +113,35 @@ const EmoAI = () => {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-screen bg-emoR text-white">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-screen bg-emoR text-white p-4 rounded-3xl">
             <div className={`fixed lg:relative bg-emo p-4 flex flex-col space-y-8 transition-transform transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
                 <a className="block w-[12rem] xl:mr-28" href="#">
                     <img src={logo} width={190} height={40} alt="FaceTune.ai" />
                 </a>
                 {!isLoading && (
                     <form onSubmit={handleSubmit} className="form-container">
-                        <label className="block mt-4">
-                            <input
-                                type="checkbox"
-                                checked={waitAudio}
-                                onChange={handleWaitAudioChange}
-                                className="mr-2"
-                            />
-                            Wait for audio
-                        </label>
+                        {/*<label className="block mt-4">*/}
+                        {/*    <input*/}
+                        {/*        type="checkbox"*/}
+                        {/*        checked={waitAudio}*/}
+                        {/*        onChange={handleWaitAudioChange}*/}
+                        {/*        className="mr-2"*/}
+                        {/*    />*/}
+                        {/*    Wait for audio*/}
+                        {/*</label>*/}
                         <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
                             Generate Music
                         </button>
                     </form>
                 )}
+
+                <form  className="form-container">
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                        Connect Spotify
+                    </button>
+                </form>
+
+
 
                 {/* Загрузчик, отображаемый во время загрузки */}
                 {isLoading && <Loader />}
