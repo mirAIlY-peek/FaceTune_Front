@@ -1,9 +1,10 @@
 {
-  "name": "FaceTune.ai",
+  "name": "FaceTune.AI",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "install": "npm install --legacy-peer-deps",
     "dev": "vite",
     "build": "vite build",
     "lint": "../node_modules/.bin/eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
