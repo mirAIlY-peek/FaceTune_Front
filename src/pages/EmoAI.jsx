@@ -8,6 +8,7 @@ import { getAiSdkControls } from "../helpers/ai-sdk/loader.js";
 import FaceTrackerComponent from "../components/FaceTrackerComponent.jsx";
 import EmotionBarsComponent from "../components/EmotionBarsComponent.jsx";
 import axios from 'axios';
+import {useNavigate} from "react-router-dom";
 
 const EmoAI = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +30,11 @@ const EmoAI = () => {
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
         setCurrentEmotion(maxEmotion);
     };
+    let navigate = useNavigate();
+
+    const handlePricingClick = () => {
+        navigate("/spotify");
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -37,7 +43,7 @@ const EmoAI = () => {
             setIsLoading(true); // Set loading state to true
 
             // Step 2: Send the processed prompt to SunoApi for audio generation
-            const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
+            const sunoApiResponse = await axios.post('http://localhost:3005/api/generate', {
                 prompt: "I feel surprised",
                 wait_audio: true
             });
@@ -86,6 +92,7 @@ const EmoAI = () => {
             const emotions = evt.detail.output.emotion;
             handleEmotionUpdate(emotions);
         };
+
 
         if (accessWebcam) {
             window.addEventListener("CY_FACE_EMOTION_RESULT", emotionUpdateHandler);
@@ -140,6 +147,12 @@ const EmoAI = () => {
                         Connect Spotify
                     </button>
                 </form>
+
+                <a className="framer-button ghost-button button-animate" onClick={handlePricingClick}>
+                    <div className="label-wrap">
+                        <p className="button-text" data-text="Join Community">Join Community</p>
+                    </div>
+                </a>
 
 
 
