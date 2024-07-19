@@ -289,7 +289,7 @@ const EmoAI = () => {
                 <WebPlaybackReact {...webPlaybackSdkProps}>
                     {playerLoaded ? (
                         <>
-                            {/*<LeftSection />*/}
+                            <LeftSection />
                             <MainSection />
                         </>
                     ) : (

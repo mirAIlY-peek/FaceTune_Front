@@ -1,5 +1,5 @@
 const client_id = "9b233dda84b94e9c8c73db98f685fb21";
-const redirect_uri = "http://localhost:5173/pricing";
+const redirect_uri = "https://face-tune-front-pyscq56jc-swip8s-projects.vercel.app/pricing";
 
 export default {
   logInWithSpotify: () => {

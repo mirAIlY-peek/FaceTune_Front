@@ -32,18 +32,18 @@ class MainSection extends Component {
 
         return (
             <div className="main-section">
-                {/*<Header username={name} img={img} />*/}
+                <Header username={name} img={img} />
                 <Modal />
                 <div className="main-section-container">
-                    {/*{view === 'browse' ? <Browse /> : null}*/}
-                    {/*{view === 'playlist' ? <Playlist /> : null}*/}
+                    {view === 'browse' ? <Browse /> : null}
+                    {view === 'playlist' ? <Playlist /> : null}
                     {view === 'recently' ? <Songs recently /> : null}
                     {view === 'songs' ? <Songs /> : null}
-                    {/*{view === 'artist' ? <Artist /> : null}*/}
-                    {/*{view === 'album' ? <Album /> : null}*/}
-                    {/*{view === 'search' ? <Search /> : null}*/}
-                    {/*{view === 'albums' ? <Albums /> : null}*/}
-                    {/*{view === 'artists' ? <Artists /> : null}*/}
+                    {view === 'artist' ? <Artist /> : null}
+                    {view === 'album' ? <Album /> : null}
+                    {view === 'search' ? <Search /> : null}
+                    {view === 'albums' ? <Albums /> : null}
+                    {view === 'artists' ? <Artists /> : null}
                 </div>
                 <Footer />
             </div>
