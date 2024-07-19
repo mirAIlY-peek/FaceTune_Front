@@ -101,7 +101,7 @@ const EmoAI = () => {
             setIsLoading(true); // Set loading state to true
 
             // Step 2: Send the processed prompt to SunoApi for audio generation
-            const sunoApiResponse = await axios.post('http://localhost:3005/api/generate', {
+            const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
                 prompt: "I feel surprised",
                 wait_audio: true
             });
