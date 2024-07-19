@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
 import './songsPlayer.css';
 
 import DetailSection from './components/detailsSection';
@@ -7,38 +7,41 @@ import SongsControl from './components/songsControl';
 import SongSider from './components/songSider';
 import VolumeControl from './components/volumeControl';
 import withPlayer from '../../hoc/playerHoc';
+import TrackCover from "../trackCover/trackCover.jsx";
+
 
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
 
     render = () => {
-        const position = this.toSeconds(this.props.trackPosition) || 0;
-        const duration = this.props.currentSong
-            ? this.toSeconds(this.props.currentSong.duration_ms)
-            : 1;
+        const { currentSong, trackPosition, contains, seekSong } = this.props;
+        const position = this.toSeconds(trackPosition) || 0;
+        const duration = currentSong ? this.toSeconds(currentSong.duration_ms) : 1;
 
         return (
             <div className='player-container'>
-                {this.props.currentSong.id ? (
+                {/*<TrackCover />*/}
+                {currentSong.id && (
                     <DetailSection
                         ids={
-                            this.props.currentSong.linked_from.id
-                                ? `${this.props.currentSong.linked_from.id},${this.props.currentSong.id}`
-                                : this.props.currentSong.id
+                            currentSong.linked_from?.id
+                                ? `${currentSong.linked_from.id},${currentSong.id}`
+                                : currentSong.id
                         }
-                        contains={this.props.contains}
-                        songName={this.props.currentSong.name || ''}
-                        album={this.props.currentSong.album.uri.split(':')[2]}
-                        artists={this.props.currentSong.artists || []}
+                        contains={contains}
+                        songName={currentSong.name || ''}
+                        album={currentSong.album.uri.split(':')[2]}
+                        artists={currentSong.artists || []}
                     />
-                ) : null}
+                )}
+
                 <SongsControl {...this.props} />
                 <SongSider
-                    isEnabled
+                    isEnabled={true}
                     value={position / duration}
                     position={position}
                     duration={duration}
-                    onChange={(value) => this.props.seekSong(Math.round(value * duration * 1000))}
+                    onChange={(value) => seekSong(Math.round(value * duration * 1000))}
                 />
                 <VolumeControl />
             </div>
@@ -46,4 +49,10 @@ class SongsPlayer extends Component {
     };
 }
 
-export default withPlayer(SongsPlayer);
+const mapStateToProps = (state) => ({
+    currentSong: state.playerReducer.currentSong,
+    trackPosition: state.playerReducer.trackPosition,
+    contains: state.libraryReducer.containsCurrent,
+});
+
+export default connect(mapStateToProps)(withPlayer(SongsPlayer));

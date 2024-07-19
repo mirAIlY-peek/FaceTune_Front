@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Loader from '../components/Loader.jsx'; // Import the loader component
+import Loader from '../components/Loader.jsx';
 import { logo } from "../assets/index.js";
 import { HiPlay, HiPause, HiVolumeUp, HiVolumeOff } from "react-icons/hi";
 import './MusicPlayer.css';
@@ -8,7 +8,20 @@ import { getAiSdkControls } from "../helpers/ai-sdk/loader.js";
 import FaceTrackerComponent from "../components/FaceTrackerComponent.jsx";
 import EmotionBarsComponent from "../components/EmotionBarsComponent.jsx";
 import axios from 'axios';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { connect } from 'react-redux';
+import { setToken } from '../store/actions/sessionActions';
+import { fetchUser } from '../store/actions/userActions';
+import Login from '../spotify/login';
+import WebPlaybackReact from '../spotify/webPlayback';
+import LeftSection from '../containers/leftSection/leftSection';
+import MainSection from '../containers/mainSection/mainSection';
+import Joyride, { STATUS } from 'react-joyride';
+import TrackCover from "../component/trackCover/trackCover.jsx";
+
+
+
+
 
 const EmoAI = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,11 +39,56 @@ const EmoAI = () => {
     const [currentEmotion, setCurrentEmotion] = useState(null);
     const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
+    const [playerLoaded, setPlayerLoaded] = useState(false);
+    const [spotifyToken, setSpotifyToken] = useState(null);
+    const [showSpotifyComponents, setShowSpotifyComponents] = useState(false);
+
+
+
+    useEffect(() => {
+        const token = Login.getToken();
+        if (token) {
+            setSpotifyToken(token);
+            setToken(token);
+            fetchUser();
+        }
+    }, [setToken, fetchUser]);
+
+    const handleConnectSpotify = () => {
+        if (!spotifyToken) {
+            Login.logInWithSpotify();
+        } else {
+            setShowSpotifyComponents(true);
+        }
+    };
+
+    const webPlaybackSdkProps = {
+        playerName: 'Spotify React Player',
+        playerInitialVolume: 1.0,
+        playerRefreshRateMs: 1000,
+        playerAutoConnect: true,
+        onPlayerRequestAccessToken: () => spotifyToken,
+        onPlayerLoading: () => {},
+        onPlayerWaitingForDevice: () => {
+            setPlayerLoaded(true);
+        },
+        onPlayerError: (e) => {
+            console.log('Player error:', e);
+        },
+        onPlayerDeviceSelected: () => {
+            setPlayerLoaded(true);
+        },
+    };
+
+
+
     const handleEmotionUpdate = (emotion) => {
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
         setCurrentEmotion(maxEmotion);
     };
     let navigate = useNavigate();
+
+
 
     const handlePricingClick = () => {
         navigate("/spotify");
@@ -74,6 +132,9 @@ const EmoAI = () => {
     // };
 
     useEffect(() => {
+
+
+
         videoEl.current = document.getElementById("videoEl");
         async function getAiSdk() {
             if (aiSdkState === "ready" && mphToolsState === "ready" && accessWebcam) {
@@ -121,6 +182,7 @@ const EmoAI = () => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-screen bg-emoR text-white p-4 rounded-3xl">
+
             <div className={`fixed lg:relative bg-emo p-4 flex flex-col space-y-8 transition-transform transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
                 <a className="block w-[12rem] xl:mr-28" href="#">
                     <img src={logo} width={190} height={40} alt="FaceTune.ai" />
@@ -136,14 +198,14 @@ const EmoAI = () => {
                         {/*    />*/}
                         {/*    Wait for audio*/}
                         {/*</label>*/}
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 ">
                             Generate Music
                         </button>
                     </form>
                 )}
 
-                <form  className="form-container">
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
+                <form className="form-container">
+                    <button type="button" onClick={handleConnectSpotify} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
                         Connect Spotify
                     </button>
                 </form>
@@ -188,7 +250,9 @@ const EmoAI = () => {
                 <div className="space-y-2 mt-auto">
                     <h2 className="text-xl font-bold">Music Controls</h2>
                     <div className="music-player">
+                        <TrackCover />
                         <div className="waveform"></div>
+
                         {generatedAudio.length > 0 && (
                             <div className="mt-4">
                                 <h2>Generated Audio:</h2>
@@ -219,6 +283,22 @@ const EmoAI = () => {
             <button className="fixed top-4 left-4 lg:hidden bg-gray-700 p-2 rounded-lg z-20" onClick={toggleMenu}>
                 {isMenuOpen ? "Close" : "Menu"}
             </button>
+
+
+            {showSpotifyComponents && (
+                <WebPlaybackReact {...webPlaybackSdkProps}>
+                    {playerLoaded ? (
+                        <>
+                            {/*<LeftSection />*/}
+                            <MainSection />
+                        </>
+                    ) : (
+                        <Loader />
+                    )}
+                </WebPlaybackReact>
+            )}
+
+
 
             <div className={`transition-all duration-300 lg:col-span-3 flex flex-col items-center justify-center ${isMenuOpen ? "ml-0" : "ml-auto"} ${isMenuOpen ? "w-full" : "lg:w-3/4"} ${!isMenuOpen && "lg:ml-0 lg:w-full"}`}>
                 <h2 className="text-3xl font-bold mb-4">Emotion Analysis</h2>
@@ -257,4 +337,13 @@ const EmoAI = () => {
     );
 };
 
-export default EmoAI;
+const mapStateToProps = (state) => ({
+    token: state.sessionReducer.token,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    setToken: (token) => dispatch(setToken(token)),
+    fetchUser: () => dispatch(fetchUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EmoAI);

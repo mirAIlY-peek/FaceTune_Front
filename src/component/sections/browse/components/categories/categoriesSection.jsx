@@ -103,14 +103,20 @@ class Categories extends Component {
     }
   };
 
-  render = () => (
-    <InfiniteScroll
-      hasMore={this.props.next ? true : false}
-      loadMore={this.props.fetchMoreCategories}
-    >
-      <ul className="browse-container">{this.renderCategories()}</ul>
-    </InfiniteScroll>
-  );
+  render() {
+    if (this.props.fetching) {
+      return <div>Loading...</div>;
+    }
+
+    return (
+        <InfiniteScroll
+            hasMore={this.props.next ? true : false}
+            loadMore={this.props.fetchMoreCategories}
+        >
+          <ul className="browse-container">{this.renderCategories()}</ul>
+        </InfiniteScroll>
+    );
+  }
 }
 
 const mapStateToProps = state => {

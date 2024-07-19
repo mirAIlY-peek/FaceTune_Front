@@ -1,5 +1,5 @@
 import React from 'react';
-import '../songsPlayer.css'
+// import '../songsPlayer.css'
 
 import Button from './controlButton';
 

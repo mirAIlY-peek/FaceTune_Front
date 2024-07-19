@@ -1,8 +1,9 @@
+// components/volumeControl.jsx
 import React, { Component } from 'react';
-import axios from '../../../axios.jsx';
+
+import axios from '../../../axios';
 import VolumeSider from './volumeSider';
 import Devices from '../../devices/devices';
-import '../songsPlayer.css'
 
 class VolumeControl extends Component {
   state = {
@@ -42,20 +43,20 @@ class VolumeControl extends Component {
   };
 
   render = () => (
-    <div className="volume-control-container">
-      <Devices />
-      <VolumeSider
-        value={this.state.volume}
-        onClick={this.onClick}
-        onChange={value => {
-          this.setState({ volume: value });
-        }}
-        onChangeEnd={value => {
-          this.setState({ volume: value });
-          this.changeVolume(value);
-        }}
-      />
-    </div>
+      <div className="volume-control-container">
+        <Devices />
+        <VolumeSider
+            value={this.state.volume}
+            onClick={this.onClick}
+            onChange={value => {
+              this.setState({ volume: value });
+            }}
+            onChangeEnd={value => {
+              this.setState({ volume: value });
+              this.changeVolume(value);
+            }}
+        />
+      </div>
   );
 }
 

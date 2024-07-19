@@ -1,83 +1,96 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
-import axios from '../../../axios.jsx';
-
 import {
-  fetchSongs,
-  fetchRecentSongs,
-  fetchMoreSongs
+    fetchSongs,
+    fetchRecentSongs,
+    fetchMoreSongs
 } from '../../../store/actions/libraryActions';
-
+import { playSong, pauseSong } from '../../../store/actions/playerActions';
 import Playlist from '../../songsTable/playlistTable/playlistTable';
 import Header from '../../header/songsHeader';
 import Spinner from '../../spinner/spinner';
 
-import withStatus from '../../../hoc/statusHoc';
+class Songs extends Component {
 
-class SongsList extends Component {
-  componentDidMount() {
-    this.fetchSongs();
-  }
 
-  fetchSongs() {
-    if (this.props.recently) {
-      this.props.fetchRecentSongs();
-    } else {
-      this.props.fetchSongs();
+
+    async componentDidMount() {
+        await this.fetchSongs();
+        this.logAllSongs();
     }
-  }
 
-  playTracks = (context, offset) => {
-    const songs = this.props.songs.slice(offset).map(s => s.track.uri);
-    axios.put('/me/player/play', { uris: songs });
-  };
+    fetchSongs() {
+        const { recently, fetchRecentSongs, fetchSongs } = this.props;
+        if (recently) {
+            return fetchRecentSongs();
+        } else {
+            return fetchSongs();
+        }
+    }
 
-  render = () => (
-      <Spinner section loading={this.props.fetching}>
-        <div className="player-container">
-          <Header
-              title={this.props.recently ? 'Recently Played' : 'Songs'}
-              playSong={() => this.playTracks(this.props.songs, 0)}
-              pauseSong={this.props.pauseSong}
-              playing={this.props.playing}
-          />
-          <Playlist
-              songs={this.props.songs}
-              playSong={this.playTracks}
-              pauseSong={this.props.pauseSong}
-              current={this.props.currentSong}
-              playing={this.props.playing}
-              more={this.props.next ? true : false}
-              fetchMoreSongs={this.props.fetchMoreSongs}
-          />
-        </div>
-      </Spinner>
-  );
+    logAllSongs() {
+        console.log('All songs:', this.props.songs);
+
+        // Добавляем вывод статистики по эмоциям
+        const emotionStats = this.props.songs.reduce((acc, song) => {
+            acc[song.emotion] = (acc[song.emotion] || 0) + 1;
+            return acc;
+        }, {});
+        console.log('Emotion statistics:', emotionStats);
+    }
+
+    playTracks = (context, offset) => {
+        const { songs, playSong } = this.props;
+        const songUris = songs.slice(offset).map(s => s.track ? s.track.uri : s.uri);
+        playSong(songUris, offset);
+    };
+
+    render() {
+        const { fetching, songs, pauseSong, playing, currentSong, next, fetchMoreSongs, recently } = this.props;
+
+        return (
+            <Spinner section loading={fetching}>
+                <div className="player-container">
+                    <Header
+                        title={recently ? 'Recently Played' : 'Songs'}
+                        playSong={() => this.playTracks(songs, 0)}
+                        pauseSong={pauseSong}
+                        playing={playing}
+                    />
+                    <Playlist
+                        songs={songs}
+                        playSong={this.playTracks}
+                        pauseSong={pauseSong}
+                        current={currentSong}
+                        playing={playing}
+                        more={!!next}
+                        fetchMoreSongs={fetchMoreSongs}
+                    />
+                </div>
+            </Spinner>
+        );
+    }
 }
 
-const mapStateToProps = state => {
-  return {
+const mapStateToProps = state => ({
     songs: state.libraryReducer.songs ? state.libraryReducer.songs.items : [],
-    user: state.userReducer.user.id,
+    user: state.userReducer.user ? state.userReducer.user.id : null,
     fetching: state.libraryReducer.fetchSongsPending,
-    next: state.libraryReducer.songs ? state.libraryReducer.songs.next : false
-  };
-};
+    next: state.libraryReducer.songs ? state.libraryReducer.songs.next : false,
+    currentSong: state.playerReducer.currentSong,
+    playing: state.playerReducer.playing
+});
 
-const mapDispatchToProps = dispatch => {
-  return bindActionCreators(
-      {
+const mapDispatchToProps = dispatch => bindActionCreators(
+    {
         fetchSongs,
         fetchRecentSongs,
-        fetchMoreSongs
-      },
-      dispatch
-  );
-};
+        fetchMoreSongs,
+        playSong,
+        pauseSong
+    },
+    dispatch
+);
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(withStatus(SongsList));
+export default connect(mapStateToProps, mapDispatchToProps)(Songs);

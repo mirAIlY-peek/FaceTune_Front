@@ -20,25 +20,26 @@ export const previousSong = () => {
     type: 'CHANGE_SONG'
   };
 };
-
-export const playSong = (context = false, offset) => {
-  if (context && offset) {
-    axios.put('/me/player/play', {
-      context_uri: context,
+export const playSong = (uris, offset = 0) => async (dispatch) => {
+  try {
+    const response = await axios.put('/me/player/play', {
+      uris: uris,
       offset: { position: offset }
     });
-  } else {
-    if (context) {
-      axios.put('/me/player/play', {
-        context_uri: context
-      });
+
+    dispatch({ type: 'PLAY_STATE' });
+  } catch (error) {
+    console.error('Error in playSong:', error.response?.data || error.message);
+
+    if (error.response?.status === 404) {
+      console.error('No active device found');
+      dispatch({ type: 'NO_ACTIVE_DEVICE' });
     } else {
-      axios.put('/me/player/play');
+      dispatch({ type: 'PLAY_ERROR', payload: error.response?.data || error.message });
     }
+
+    throw error;
   }
-  return {
-    type: 'PLAY_STATE'
-  };
 };
 
 export const playTracks = (tracks, offset) => {

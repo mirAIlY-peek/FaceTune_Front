@@ -1,19 +1,24 @@
 export const playlistReducer = (state = {}, action) => {
   switch (action.type) {
+    case 'FETCH_SONGS_SUCCESS':
+      return {
+        ...state,
+        songs: {
+          ...action.songs,
+          items: action.songs.items.map(song => ({
+            ...song,
+            genres: song.genres || [],
+            emotion: song.emotion || 'neutral' // Добавляем эмоцию
+          }))
+        },
+        fetchSongsError: false,
+        fetchSongsPending: false
+      };
     case 'FETCH_SONGS_PENDING':
       return {
         ...state,
         fetchSongsPending: true
       };
-
-    case 'FETCH_SONGS_SUCCESS':
-      return {
-        ...state,
-        songs: action.songs,
-        fetchSongsError: false,
-        fetchSongsPending: false
-      };
-
     case 'FETCH_SONGS_ERROR':
       return {
         ...state,

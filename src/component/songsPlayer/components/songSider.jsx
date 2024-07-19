@@ -1,71 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import '../songsPlayer.css';
+// components/songSider.jsx
+import React from 'react';
 
-const ProgressBar = ({ isEnabled, direction = 'horizontal', value, onChange, onClick }) => {
-    const [isDragging, setIsDragging] = useState(false);
-    const sliderRef = useRef(null);
+const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+};
 
-    const handleMouseDown = (e) => {
-        if (!isEnabled) return;
-        setIsDragging(true);
-        updateValue(e);
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-        updateValue(e);
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
-    const updateValue = (e) => {
-        if (!sliderRef.current) return;
-        const rect = sliderRef.current.getBoundingClientRect();
-        const position = direction === 'horizontal' ? e.clientX - rect.left : rect.bottom - e.clientY;
-        const size = direction === 'horizontal' ? rect.width : rect.height;
-        let newValue = position / size;
-        newValue = Math.max(0, Math.min(1, newValue));
-        onChange(newValue);
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging]);
-
-    const volumeClass =
-        value > 0.5 ? 'fa-volume-up' : value === 0 ? 'fa-volume-off' : 'fa-volume-down';
+const SongSider = ({ isEnabled, value, position, duration, onChange }) => {
+    // Ensure value is a number between 0 and 100
+    const sliderValue = isNaN(value) || value < 0 ? 0 : value > 1 ? 100 : value * 100;
 
     return (
-        <div className='volume-slider-container'>
-            <i onClick={onClick} className={`volume fa ${volumeClass}`} aria-hidden='true' />
-            <div
-                ref={sliderRef}
-                className={`custom-slider ${direction}`}
-                onMouseDown={handleMouseDown}
-            >
-                <div
-                    className='slider-bar'
-                    style={{
-                        [direction === 'horizontal' ? 'width' : 'height']: `${value * 100}%`
-                    }}
-                />
-                <div
-                    className='slider-handle'
-                    style={{
-                        [direction === 'horizontal' ? 'left' : 'bottom']: `${value * 100}%`,
-                        transform: `translate${direction === 'horizontal' ? 'X' : 'Y'}(-50%)`
-                    }}
-                />
-            </div>
+        <div className="song-slider-container">
+            <span>{formatTime(position)}</span>
+            <input
+                type="range"
+                className="song-slider"
+                disabled={!isEnabled}
+                min={0}
+                max={100}
+                value={sliderValue}
+                onChange={(e) => onChange(Number(e.target.value) / 100)}
+            />
+            <span>{formatTime(duration || 0)}</span>
         </div>
     );
 };
 
-export default ProgressBar;
+export default SongSider;
