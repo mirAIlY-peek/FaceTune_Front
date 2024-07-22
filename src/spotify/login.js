@@ -1,6 +1,6 @@
-const client_id = "36fa42934ba149c8a149e6afd9be23e5";
-const redirect_uri = "http://localhost:5173/pricing";
-const client_secret = 'a17d0b4bcfce4fbd8c3b5815e6fec7af'; // Замените на ваш реальный client secret
+const client_id = import.meta.env.VITE_CLIENT_ID;
+const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
+const client_secret = import.meta.env.VITE_CLIENT_SECRET;
 
 const Login = {
   logInWithSpotify: () => {
@@ -8,7 +8,21 @@ const Login = {
       'streaming',
       'user-read-private',
       'user-read-email',
-      // ... остальные scopes
+      'playlist-modify-public',
+      'user-read-recently-played',
+      'user-read-playback-state',
+      'user-modify-playback-state',
+      'user-library-modify',
+      'user-follow-modify',
+      'playlist-read-private',
+      'playlist-modify-public',
+      'playlist-modify-private',
+      'playlist-read-collaborative',
+      'user-library-read',
+      'user-read-playback-position',
+      'user-top-read',
+      'user-follow-modify',
+      'user-follow-read',
     ].join(' ');
 
     let scopes_encoded = encodeURIComponent(scopes);
