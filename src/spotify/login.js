@@ -1,28 +1,14 @@
-const client_id = "9b233dda84b94e9c8c73db98f685fb21";
-const base_url = new URL(window.location.href).origin;
-const redirect_uri = `${base_url}/pricing`;
+const client_id = "36fa42934ba149c8a149e6afd9be23e5";
+const redirect_uri = "http://localhost:5173/pricing";
+const client_secret = 'a17d0b4bcfce4fbd8c3b5815e6fec7af'; // Замените на ваш реальный client secret
 
-export default {
+const Login = {
   logInWithSpotify: () => {
     let scopes = [
       'streaming',
       'user-read-private',
       'user-read-email',
-      'playlist-modify-public',
-      'user-read-recently-played',
-      'user-read-playback-state',
-      'user-modify-playback-state',
-      'user-library-modify',
-      'user-follow-modify',
-      'playlist-read-private',
-      'playlist-modify-public',
-      'playlist-modify-private',
-      'playlist-read-collaborative',
-      'user-library-read',
-      'user-read-playback-position',
-      'user-top-read',
-      'user-follow-modify',
-      'user-follow-read',
+      // ... остальные scopes
     ].join(' ');
 
     let scopes_encoded = encodeURIComponent(scopes);
@@ -32,25 +18,103 @@ export default {
       `?client_id=${client_id}`,
       `&redirect_uri=${redirect_uri}`,
       `&scope=${scopes_encoded}`,
-      '&response_type=token',
+      '&response_type=code',
       '&show_dialog=true',
     ].join('');
   },
 
-  getToken: () => {
-    let hashParams = {};
-    let e,
-        r = /([^&;=]+)=?([^&;]*)/g,
-        q = window.location.hash.substring(1);
-    while ((e = r.exec(q))) {
-      hashParams[e[1]] = decodeURIComponent(e[2]);
+  getToken: async () => {
+    const accessToken = localStorage.getItem('spotify_access_token');
+    const refreshToken = localStorage.getItem('spotify_refresh_token');
+    const expiryTime = localStorage.getItem('spotify_token_expiry');
+
+    if (!accessToken || !refreshToken || !expiryTime) {
+      return null;
     }
-    if (hashParams.access_token) {
-      localStorage.setItem('spotify_token', hashParams.access_token);
-      window.location.hash = '';
-      return hashParams.access_token;
-    } else {
-      return localStorage.getItem('spotify_token');
+
+    if (Date.now() > parseInt(expiryTime)) {
+      // Token has expired, refresh it
+      return await Login.refreshAccessToken(refreshToken);
+    }
+
+    return accessToken;
+  },
+
+  exchangeCodeForTokens: async (code) => {
+    const tokenEndpoint = 'https://accounts.spotify.com/api/token';
+
+    const data = new URLSearchParams();
+    data.append('grant_type', 'authorization_code');
+    data.append('code', code);
+    data.append('redirect_uri', redirect_uri);
+    data.append('client_id', client_id);
+    data.append('client_secret', client_secret);
+
+    try {
+      const response = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      const { access_token, refresh_token, expires_in } = responseData;
+
+      // Store tokens
+      localStorage.setItem('spotify_access_token', access_token);
+      localStorage.setItem('spotify_refresh_token', refresh_token);
+      localStorage.setItem('spotify_token_expiry', (Date.now() + expires_in * 1000).toString());
+
+      return access_token;
+    } catch (error) {
+      console.error('Error exchanging code for tokens:', error);
+      return null;
+    }
+  },
+
+  refreshAccessToken: async (refreshToken) => {
+    const tokenEndpoint = 'https://accounts.spotify.com/api/token';
+
+    const data = new URLSearchParams();
+    data.append('grant_type', 'refresh_token');
+    data.append('refresh_token', refreshToken);
+    data.append('client_id', client_id);
+    data.append('client_secret', client_secret);
+
+    try {
+      const response = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      const { access_token, expires_in } = responseData;
+
+      // Update stored tokens
+      localStorage.setItem('spotify_access_token', access_token);
+      localStorage.setItem('spotify_token_expiry', (Date.now() + expires_in * 1000).toString());
+
+      return access_token;
+    } catch (error) {
+      console.error('Error refreshing access token:', error);
+      return null;
     }
   },
 };
+
+export default Login;

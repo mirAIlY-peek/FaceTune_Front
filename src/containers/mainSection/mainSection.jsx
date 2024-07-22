@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import Browse from '../../component/sections/browse/browser';
 import Search from '../../component/sections/search/search.jsx';
 import Artist from '../../component/sections/artist/artist.jsx';
-import Artists from '../../component/sections/top/artists';
-
 
 
 
@@ -18,6 +16,7 @@ import Modal from '../../component/playlistModal/modal';
 import Playlist from '../../component/sections/playlist/playlist';
 import defaultProfile from './images/profile.png';
 import './mainSection.css';
+import Artists from "../../component/sections/top/artists.jsx";
 
 class MainSection extends Component {
     render() {
@@ -32,7 +31,7 @@ class MainSection extends Component {
 
         return (
             <div className="main-section">
-                <Header username={name} img={img} />
+                {/*<Header username={name} img={img} />*/}
                 <Modal />
                 <div className="main-section-container">
                     {view === 'browse' ? <Browse /> : null}

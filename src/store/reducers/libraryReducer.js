@@ -1,4 +1,16 @@
-export const playlistReducer = (state = {}, action) => {
+const initialState = {
+  songs: {
+    items: [],
+    total: 0,
+    next: null
+  },
+  fetchSongsError: false,
+  fetchSongsPending: false,
+  lastFetchTime: null,
+  containsCurrent: false
+};
+
+export const playlistReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'FETCH_SONGS_SUCCESS':
       return {
@@ -8,11 +20,12 @@ export const playlistReducer = (state = {}, action) => {
           items: action.songs.items.map(song => ({
             ...song,
             genres: song.genres || [],
-            emotion: song.emotion || 'neutral' // Добавляем эмоцию
+            emotion: song.emotion || 'neutral'
           }))
         },
         fetchSongsError: false,
-        fetchSongsPending: false
+        fetchSongsPending: false,
+        lastFetchTime: Date.now()
       };
     case 'FETCH_SONGS_PENDING':
       return {
@@ -25,15 +38,13 @@ export const playlistReducer = (state = {}, action) => {
         fetchSongsError: true,
         fetchSongsPending: false
       };
-
     case 'FETCH_MORE_SONGS_SUCCESS':
-      let items = [...state.songs.items, ...action.songs];
       return {
         ...state,
         songs: {
           ...state.songs,
           next: action.next,
-          items: items
+          items: [...state.songs.items, ...action.songs]
         }
       };
     case 'CONTAINS_CURRENT_SUCCESS':

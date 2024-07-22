@@ -20,6 +20,7 @@ export const previousSong = () => {
     type: 'CHANGE_SONG'
   };
 };
+
 export const playSong = (uris, offset = 0) => async (dispatch) => {
   try {
     const response = await axios.put('/me/player/play', {
@@ -27,18 +28,22 @@ export const playSong = (uris, offset = 0) => async (dispatch) => {
       offset: { position: offset }
     });
 
+    console.log('Play response:', response); // Для отладки
+
     dispatch({ type: 'PLAY_STATE' });
   } catch (error) {
     console.error('Error in playSong:', error.response?.data || error.message);
 
+    // Проверка на отсутствие активного устройства
     if (error.response?.status === 404) {
       console.error('No active device found');
+      // Здесь можно диспатчить action для показа уведомления пользователю
       dispatch({ type: 'NO_ACTIVE_DEVICE' });
     } else {
       dispatch({ type: 'PLAY_ERROR', payload: error.response?.data || error.message });
     }
 
-    throw error;
+    throw error; // Прокидываем ошибку дальше для обработки в компоненте
   }
 };
 

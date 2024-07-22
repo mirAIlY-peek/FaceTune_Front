@@ -13,13 +13,14 @@ import './leftSection.css';
 class LeftSection extends Component {
   render() {
     return (
-      <div className="left-section">
         <SiderMenu />
-        <div className="buttom-section">
-          <NewPlaylist setModal={this.props.setModal} />
-          <TrackCover />
-        </div>
-      </div>
+      // <div className="left-section">
+      //   <SiderMenu />
+      //   <div className="buttom-section">
+      //     <NewPlaylist setModal={this.props.setModal} />
+      //     <TrackCover />
+      //   </div>
+      // </div>
     );
   }
 }

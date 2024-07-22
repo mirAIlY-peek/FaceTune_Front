@@ -9,30 +9,34 @@ import './siderMenu.css';
 import withUiActions from '../../hoc/uiHoc';
 import MenuItem from './components/menuItem';
 
-const sectionOne = [{ name: 'Browse', view: 'browse', id: 1 }];
+const sectionOne = [  { name: 'Songs', view: 'songs', id: 1 }];
 
 const sectionTwo = [
   { name: 'Recently Played', view: 'recently', id: 2 },
-  { name: 'Songs', view: 'songs', id: 3 },
+  { name: 'Browse', view: 'browse', id: 3 },
   { name: 'Albums', view: 'albums', id: 4 },
   { name: 'Artists', view: 'artists', id: 5 }
 ];
 
 class SiderMenu extends Component {
   state = {
-    active: 'Browse'
+    active: 'Songs',
+    initialFetchDone: false
   };
 
   componentDidMount() {
-    this.props.fetchPlaylistsMenu();
+    if (!this.state.initialFetchDone) {
+      this.props.fetchPlaylistsMenu();
+      this.setState({ initialFetchDone: true });
+    }
   }
 
   setActive = (item, playlist) => {
     this.setState({ active: item.id });
     if (playlist) {
       this.props.onPlaylistClick(item.id);
-    } else {
-      this.props.setView(item.view || 'browse');
+    } else if (item.view !== this.state.active) {
+      this.props.setView(item.view || 'songs');
     }
   };
 
@@ -52,12 +56,12 @@ class SiderMenu extends Component {
     return (
       <ul className="side-menu-container">
         {this.generateItems(sectionOne)}
-        <h3 className="library-header">Your Library</h3>
-        {this.generateItems(sectionTwo)}
-        <div className="user-playlist-container">
-          <h3 className="library-header">Playlists</h3>
-          {this.generateItems(playlists, true)}
-        </div>
+        {/*<h3 className="library-header">Your Library</h3>*/}
+        {/*{this.generateItems(sectionTwo)}*/}
+        {/*<div className="user-playlist-container">*/}
+        {/*  <h3 className="library-header">Playlists</h3>*/}
+        {/*  {this.generateItems(playlists, true)}*/}
+        {/*</div>*/}
       </ul>
     );
   };

@@ -16,14 +16,9 @@ import Login from '../spotify/login';
 import WebPlaybackReact from '../spotify/webPlayback';
 import LeftSection from '../containers/leftSection/leftSection';
 import MainSection from '../containers/mainSection/mainSection';
-import Joyride, { STATUS } from 'react-joyride';
 import TrackCover from "../component/trackCover/trackCover.jsx";
 
-
-
-
-
-const EmoAI = () => {
+const EmoAI = ({ setToken, fetchUser }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
@@ -34,25 +29,43 @@ const EmoAI = () => {
     const videoEl = useRef(null);
 
     const [generatedAudio, setGeneratedAudio] = useState([]);
-    const [prompt, setPrompt] = useState('');
-    // const [waitAudio, setWaitAudio] = useState(false);
     const [currentEmotion, setCurrentEmotion] = useState(null);
-    const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+    const [isLoading, setIsLoading] = useState(false);
 
     const [playerLoaded, setPlayerLoaded] = useState(false);
     const [spotifyToken, setSpotifyToken] = useState(null);
     const [showSpotifyComponents, setShowSpotifyComponents] = useState(false);
 
-
+    let navigate = useNavigate();
 
     useEffect(() => {
-        const token = Login.getToken();
-        if (token) {
-            setSpotifyToken(token);
-            setToken(token);
-            fetchUser();
-        }
+        const checkAndSetToken = async () => {
+            const token = await Login.getToken();
+            if (token) {
+                setSpotifyToken(token);
+                setToken(token);
+                fetchUser();
+            }
+        };
+
+        checkAndSetToken();
     }, [setToken, fetchUser]);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            Login.exchangeCodeForTokens(code).then(token => {
+                if (token) {
+                    setSpotifyToken(token);
+                    setToken(token);
+                    fetchUser();
+                    navigate('/pricing', { replace: true });
+                }
+            });
+        }
+    }, [setToken, fetchUser, navigate]);
 
     const handleConnectSpotify = () => {
         if (!spotifyToken) {
@@ -80,61 +93,38 @@ const EmoAI = () => {
         },
     };
 
-
-
     const handleEmotionUpdate = (emotion) => {
         const maxEmotion = Object.keys(emotion).reduce((a, b) => emotion[a] > emotion[b] ? a : b);
         setCurrentEmotion(maxEmotion);
     };
-    let navigate = useNavigate();
-
-
 
     const handlePricingClick = () => {
         navigate("/spotify");
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault(); // Prevent the default form submission behavior
-
+        event.preventDefault();
         try {
-            setIsLoading(true); // Set loading state to true
-
-            // Step 2: Send the processed prompt to SunoApi for audio generation
+            setIsLoading(true);
             const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
                 prompt: "I feel surprised",
                 wait_audio: true
             });
-
             const data = sunoApiResponse.data;
             console.log('SunoApi Response:', data);
             setGeneratedAudio(data);
-
-            // Play the generated audio
             if (data.length > 0) {
-                const audioElement = new Audio(data[0].audio_url); // Example: select the first element
+                const audioElement = new Audio(data[0].audio_url);
                 audioElement.play();
             }
         } catch (error) {
             console.error('Error processing prompt:', error);
         } finally {
-            setIsLoading(false); // Set loading state to false after API call completes
+            setIsLoading(false);
         }
     };
 
-    // const handleChange = (event) => {
-    //     setPrompt(event.target.value);
-    // };
-
-    // const handleWaitAudioChange = (event) => {
-    //     setWaitAudio(event.target.checked);
-    //     console.log(event.target.checked)
-    // };
-
     useEffect(() => {
-
-
-
         videoEl.current = document.getElementById("videoEl");
         async function getAiSdk() {
             if (aiSdkState === "ready" && mphToolsState === "ready" && accessWebcam) {
@@ -153,7 +143,6 @@ const EmoAI = () => {
             const emotions = evt.detail.output.emotion;
             handleEmotionUpdate(emotions);
         };
-
 
         if (accessWebcam) {
             window.addEventListener("CY_FACE_EMOTION_RESULT", emotionUpdateHandler);
@@ -179,7 +168,6 @@ const EmoAI = () => {
     const handleAccessWebcam = () => {
         setAccessWebcam(true);
     };
-
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-screen bg-emoR text-white p-4 rounded-3xl">
 
@@ -275,6 +263,7 @@ const EmoAI = () => {
                             <button onClick={toggleMute}>
                                 {isMuted ? <HiVolumeOff /> : <HiVolumeUp />}
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -336,7 +325,6 @@ const EmoAI = () => {
         </div>
     );
 };
-
 const mapStateToProps = (state) => ({
     token: state.sessionReducer.token,
 });
