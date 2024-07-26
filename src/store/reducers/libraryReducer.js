@@ -50,7 +50,7 @@ export const playlistReducer = (state = initialState, action) => {
     case 'CONTAINS_CURRENT_SUCCESS':
       return {
         ...state,
-        containsCurrent: action.contains.data.includes(true)
+        containsCurrent: Array.isArray(action.contains) ? action.contains.includes(true) : false
       };
     case 'REMOVE_SONG_SUCCESS':
       return {

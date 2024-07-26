@@ -80,11 +80,14 @@ const PlaylistTable = (props) => {
                     item={item.track || item}
                     id={item.track ? item.track.id : item.id}
                     uri={props.uri}
-                    offset={i}
                     current={props.current}
                     playing={props.playing}
                     pauseSong={props.pauseSong}
-                    playSong={props.playSong}
+                    songId={item.track ? item.track.id : item.id}
+                    playSong={() => {
+                      console.log('Playing song with ID:', item.track ? item.track.id : item.id);
+                      props.playSong(props.uri, item.track ? item.track.id : item.id);
+                    }}
                 />
             ))}
           </InfiniteScroll>

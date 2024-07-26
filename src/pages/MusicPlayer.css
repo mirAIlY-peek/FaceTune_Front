@@ -9,6 +9,11 @@
     max-width: 400px;
 }
 
+.logo-size{
+    width: 90%;
+    height: auto;
+}
+
 .music-player .waveform {
     height: 32px;
     background-color: #444;
@@ -77,4 +82,102 @@
     background: #fff;
     cursor: pointer;
     border-radius: 50%;
+}
+
+@media (max-height: 600px) {
+    .video-container {
+        max-height: 60vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .video-container {
+        max-width: 90vw;
+    }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #ffffff; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent; /* Transparent track */
+}
+
+
+.player-container {
+    background: transparent;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.song-details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.song-details img {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.song-info {
+    flex-grow: 1;
+}
+
+.song-name {
+    font-weight: bold;
+    color: #fff;
+}
+
+.artist-name {
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.controls button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5em;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.song-slider {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+}
+
+.volume-control button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.2em;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.volume-slider {
+    flex-grow: 1;
 }

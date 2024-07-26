@@ -10,7 +10,7 @@ const trackCover = props => {
         src={
           props.currentSong.album ? props.currentSong.album.images[2].url : ''
         }
-        style={{ width: '100%' }}
+        style={{ width: '50%' }}
       />
     </div>
   ) : null;

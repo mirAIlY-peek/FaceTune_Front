@@ -1,23 +1,24 @@
-.details-container {
+.user-details-container {
   display: flex;
-  justify-content: flex-end;
-  padding: 10px 0px;
-  background: rgb(24, 24, 24);
-}
-.details-container .user-image {
-  border-radius: 50%;
-  height: 30px;
-}
-.details-container .user-name {
-  color: #fff;
-  font-size: 14px;
-  position: relative;
-  top: -5px;
-  margin-left: 10px;
-  padding-right: 10px;
-}
-.details-container .user-name:hover {
-  text-decoration: underline;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 5px 10px;
 }
 
-/*# sourceMappingURL=userDetails.css.map */
+.user-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.user-name {
+  color: #fff;
+  font-size: 14px;
+}
+
+.user-name:hover {
+  text-decoration: underline;
+}

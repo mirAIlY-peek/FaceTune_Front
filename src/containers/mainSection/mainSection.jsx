@@ -6,7 +6,6 @@ import Search from '../../component/sections/search/search.jsx';
 import Artist from '../../component/sections/artist/artist.jsx';
 
 
-
 import Header from '../../component/header/header';
 import Footer from '../../component/footer/footer';
 import Songs from '../../component/sections/songList/songList';
@@ -31,7 +30,7 @@ class MainSection extends Component {
 
         return (
             <div className="main-section">
-                {/*<Header username={name} img={img} />*/}
+                <Header username={name} img={img} />
                 <Modal />
                 <div className="main-section-container">
                     {view === 'browse' ? <Browse /> : null}
@@ -44,7 +43,7 @@ class MainSection extends Component {
                     {view === 'albums' ? <Albums /> : null}
                     {view === 'artists' ? <Artists /> : null}
                 </div>
-                <Footer />
+                {/*<Footer />*/}
             </div>
         );
     }

@@ -21,14 +21,27 @@ export const previousSong = () => {
   };
 };
 
-export const playSong = (uris, offset = 0) => async (dispatch) => {
+export const playSong = (uris, songId) => async (dispatch, getState) => {
   try {
+    const state = getState();
+    const allSongs = state.libraryReducer.songs.items;
+    console.log('All songs in state:', allSongs);
+    console.log('Trying to play song with ID:', songId);
+
+    const songIndex = allSongs.findIndex(song => (song.track ? song.track.id : song.id) === songId);
+
+    if (songIndex === -1) {
+      console.error('Song not found in the list');
+      console.log('Available song IDs:', allSongs.map(song => song.track ? song.track.id : song.id));
+      return;
+    }
+
     const response = await axios.put('/me/player/play', {
       uris: uris,
-      offset: { position: offset }
+      offset: { position: songIndex }
     });
 
-    console.log('Play response:', response); // Для отладки
+    console.log('Play response:', response);
 
     dispatch({ type: 'PLAY_STATE' });
   } catch (error) {

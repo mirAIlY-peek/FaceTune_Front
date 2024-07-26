@@ -9,7 +9,6 @@ import VolumeControl from './components/volumeControl';
 import withPlayer from '../../hoc/playerHoc';
 import TrackCover from "../trackCover/trackCover.jsx";
 
-
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
 
@@ -19,9 +18,9 @@ class SongsPlayer extends Component {
         const duration = currentSong ? this.toSeconds(currentSong.duration_ms) : 1;
 
         return (
-            <div className='player-container'>
-                {/*<TrackCover />*/}
-                {currentSong.id && (
+            <div className="player-container">
+                <div className="player-left">
+                    <TrackCover />
                     <DetailSection
                         ids={
                             currentSong.linked_from?.id
@@ -30,26 +29,30 @@ class SongsPlayer extends Component {
                         }
                         contains={contains}
                         songName={currentSong.name || ''}
-                        album={currentSong.album.uri.split(':')[2]}
+                        album={currentSong.album?.uri.split(':')[2]}
                         artists={currentSong.artists || []}
                     />
-                )}
-
-                <SongsControl {...this.props} />
-                <SongSider
-                    isEnabled={true}
-                    value={position / duration}
-                    position={position}
-                    duration={duration}
-                    onChange={(value) => seekSong(Math.round(value * duration * 1000))}
-                />
-                <VolumeControl />
+                </div>
+                <div className="player-center">
+                    <SongsControl {...this.props} />
+                    <SongSider
+                        isEnabled={true}
+                        value={position / duration}
+                        position={position}
+                        duration={duration}
+                        onChange={(value) => seekSong(Math.round(value * duration * 1000))}
+                    />
+                </div>
+                <div className="player-right">
+                    <VolumeControl />
+                </div>
             </div>
         );
     };
 }
 
 const mapStateToProps = (state) => ({
+    token: state.sessionReducer.token,
     currentSong: state.playerReducer.currentSong,
     trackPosition: state.playerReducer.trackPosition,
     contains: state.libraryReducer.containsCurrent,

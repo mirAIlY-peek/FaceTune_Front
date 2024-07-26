@@ -49,8 +49,14 @@ export const containsCurrentSong = id => {
   return async dispatch => {
     try {
       const response = await axios.get(`/me/tracks/contains?ids=${id}`);
-      dispatch(containsSongSuccess(response.data));
-      return response.data;
+      console.log('Response from containsCurrentSong:', response);
+      if (response && response.data) {
+        dispatch(containsSongSuccess(response.data));
+        return response.data;
+      } else {
+        console.error('Unexpected response format:', response);
+        return null;
+      }
     } catch (error) {
       console.error('Error checking if song contains:', error);
       return error;
