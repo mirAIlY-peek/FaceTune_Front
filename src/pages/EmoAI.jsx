@@ -17,14 +17,13 @@ import WebPlaybackReact from '../spotify/webPlayback';
 import LeftSection from '../containers/leftSection/leftSection';
 import MainSection from '../containers/mainSection/mainSection';
 import TrackCover from "../component/trackCover/trackCover.jsx";
+import { FaSmileBeam, FaMusic } from 'react-icons/fa';
 
 import Joyride, {ACTIONS, EVENTS, STATUS} from 'react-joyride';
 
 import SongsPlayer from '../component/songsPlayer/songsPlayer.jsx';
 import Header from "../component/header/header.jsx";
-
-
-
+import PhotoTrackerAnalyzer from "../components/PhotoEmotionAnalyzer.jsx"
 
 // import Tooltips from "../components/Tooltips.jsx";
 
@@ -51,6 +50,12 @@ const EmoAI = ({setToken, fetchUser }) => {
     const [showSpotifyComponents, setShowSpotifyComponents] = useState(false);
 
     const [runJoyride, setRunJoyride] = useState(false);
+
+    const [selectedMode, setSelectedMode] = useState('photo');
+
+    const toggleMode = (mode) => {
+        setSelectedMode(mode);
+    };
 
     const steps = [
         {
@@ -262,35 +267,38 @@ const EmoAI = ({setToken, fetchUser }) => {
 
 
 
-                <div className={`fixed lg:relative bg-emo p-4 flex flex-col h-screen lg:h-full transition-transform transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 rounded-xl overflow-hidden`}>
+                <div className={`fixed inset-0 bg-emo p-4 flex flex-col transition-transform transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:relative lg:translate-x-0 rounded-xl overflow-hidden z-50`}>
+                    {/* Close button for mobile */}
+                    <button className="lg:hidden absolute top-8 right-8 text-xl" onClick={toggleMenu}>
+                        close
+                    </button>
                     <div className="flex-grow overflow-y-auto">
-                        <div className="flex flex-col space-y-4 mb-4">
+                        <div className="flex flex-col space-y-6 mb-8">
                             <a className="block w-[12rem] xl:mr-28" href="/">
                                 <img src={logo} alt="FaceTune.ai" className="logo-size"/>
                             </a>
-                            {/*{!isLoading && (*/}
-                            {/*    <button onClick={handleSubmit} className="bg-blue-500 text-white px-4 py-2 w-full rounded-full">*/}
-                            {/*        Generate Music*/}
-                            {/*    </button>*/}
-                            {/*)}*/}
-                            {/*<button onClick={handleConnectSpotify} className="bg-green-500 text-white px-4 py-2 w-full rounded-full">*/}
-                            {/*    Connect Spotify*/}
-                            {/*</button>*/}
-                            {/*/!*<button onClick={handlePricingClick} className="bg-purple-500 text-white px-4 py-2 w-full rounded-full">*!/*/}
-                            {/*/!*    Join Community*!/*/}
-                            {/*/!*</button>*!/*/}
                         </div>
 
                         {isLoading && <Loader/>}
 
-                        <div className="space-y-4">
-                            <div className="bg-EmoButton p-3 rounded-lg">
-                                <h2 className="text-lg font-bold mb-2">Current Emotion</h2>
-                                <h3 className="text-yellow-500 text-xl font-bold">{currentEmotion}</h3>
+                        <div className="space-y-6">
+                            <div className="bg-EmoButton p-4 rounded-lg">
+                                <div className="flex items-center mb-2">
+                                    {/*<FaSmileBeam className="text-yellow-500 text-2xl mr-2" />*/}
+                                    <h2 className="text-lg font-bold">Current Emotion</h2>
+                                </div>
+                                {currentEmotion ? (
+                                    <h3 className="text-yellow-500 text-xl font-bold">{currentEmotion}</h3>
+                                ) : (
+                                    <p className="text-gray-400 text-x">Your emotion will appear here</p>
+                                )}
                             </div>
-                            <div className="bg-EmoButton p-3 rounded-lg">
-                                <h2 className="text-lg font-bold mb-2">Recommended Music</h2>
-                                {generatedAudio.length > 0 && (
+                            <div className="bg-EmoButton p-4 rounded-lg">
+                                <div className="flex items-center mb-2">
+                                    {/*<FaMusic className="text-purple-500 text-2xl mr-2" />*/}
+                                    <h2 className="text-lg font-bold">Recommended Music</h2>
+                                </div>
+                                {generatedAudio.length > 0 ? (
                                     <div className="flex items-center space-x-2">
                                         {generatedAudio[0].image_url && (
                                             <img src={generatedAudio[0].image_url}
@@ -302,14 +310,16 @@ const EmoAI = ({setToken, fetchUser }) => {
                                             <p className="text-xs text-gray-300">{generatedAudio[0].tags}</p>
                                         </div>
                                     </div>
+                                ) : (
+                                    <p className="text-gray-400 text-base">Recommended music will appear here</p>
                                 )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-auto pt-4">
+                    <div className="mt-auto pt-6">
                         <h2 className="text-lg font-bold mb-2">Music Controls</h2>
-                        <div className="music-player bg-EmoButton p-3 rounded-lg">
+                        <div className="music-player bg-EmoButton p-4 rounded-lg">
                             <SongsPlayer />
                         </div>
                     </div>
@@ -318,7 +328,6 @@ const EmoAI = ({setToken, fetchUser }) => {
                 {/*<button className="fixed top-4 left-4 lg:hidden bg-gray-700 p-2 rounded-lg z-20" onClick={toggleMenu}>*/}
                 {/*    {isMenuOpen ? "Close" : "Menu"}*/}
                 {/*</button>*/}
-
 
 
 
@@ -332,51 +341,81 @@ const EmoAI = ({setToken, fetchUser }) => {
                         isLoading={isLoading}
                         toggleMenu={toggleMenu}
                     />
-                    <div className="flex-grow flex flex-col overflow-hidden bg-emo rounded-xl p-4">
-                        <h2 className="text-2xl font-bold mb-2">Emotion Analysis</h2>
-                        <p className="mb-2 text-sm">
-                            Allow access to your webcam to capture your face and analyze your emotions in real-time.
-                        </p>
 
-                        <div className="flex-grow flex items-center justify-center">
-                            <div className="flex flex-col md:flex-row items-start justify-center space-y-4 md:space-y-0 md:space-x-8 w-full max-w-4xl">
-                                <div className="relative w-full md:w-2/3 h-64 md:h-96">
-                                    {accessWebcam ? (
-                                        <div className="video-container w-full h-full rounded-full overflow-hidden">
-                                            <div style={{
-                                                position: "relative",
-                                                width: "100%",
-                                                height: "100%",
-                                                overflow: "hidden"
-                                            }}>
-                                                <video id="videoEl" autoPlay style={{
-                                                    position: "absolute",
+
+
+
+                    <div className="flex-grow flex flex-col items-center overflow-hidden bg-emo rounded-xl p-4">
+                        {/*<h2 className="text-2xl font-bold mb-2 text-center">Emotion Analysis</h2>*/}
+                        {/*<p className="mb-4 text-sm text-center">*/}
+                        {/*    Allow access to your webcam to capture your face and analyze your emotions in real-time.*/}
+                        {/*</p>*/}
+
+                        {/*<PhotoTrackerAnalyzer/>*/}
+
+                        <div className="flex flex-col items-center overflow-hidden bg-emo rounded-xl p-4">
+                            <h2 className="text-2xl font-bold mb-2 text-center">Emotion Analysis</h2>
+                            <p className="mb-4 text-sm text-center">
+                                Choose to upload a photo or use your webcam for real-time emotion analysis.
+                            </p>
+
+                            <div className="flex space-x-4 mb-6">
+                                <button
+                                    className={`bg-EmoButton px-6 py-2 rounded-full transition-colors ${selectedMode === 'photo' ? 'bg-purple-600' : ''}`}
+                                    onClick={() => toggleMode('photo')}
+                                >
+                                    Upload Photo
+                                </button>
+                                <button
+                                    className={`bg-EmoButton px-6 py-2 rounded-full transition-colors ${selectedMode === 'webcam' ? 'bg-purple-600' : ''}`}
+                                    onClick={() => toggleMode('webcam')}
+                                >
+                                    Use Camera
+                                </button>
+                            </div>
+
+                            {selectedMode === 'photo' ? (
+                                <PhotoTrackerAnalyzer />
+                            ) : (
+                                <div className="flex flex-col items-center justify-start w-full max-w-4xl">
+                                    <div className="relative w-full max-w-md h-64 mb-4">
+                                        {accessWebcam ? (
+                                            <div className="video-container w-full h-full rounded-lg overflow-hidden">
+                                                <div style={{
+                                                    position: "relative",
                                                     width: "100%",
                                                     height: "100%",
-                                                    objectFit: "cover",
-                                                    transform: "scaleX(-1)"
-                                                }} playsInline></video>
-                                                <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
+                                                    overflow: "hidden"
+                                                }}>
+                                                    <video id="videoEl" autoPlay style={{
+                                                        position: "absolute",
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        transform: "scaleX(-1)"
+                                                    }} playsInline></video>
+                                                    <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
+                                                </div>
                                             </div>
+                                        ) : (
+                                            <>
+                                                <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
+                                                        Access WebCam
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {accessWebcam && (
+                                        <div className="w-full max-w-md mt-4">
+                                            <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
                                         </div>
-                                    ) : (
-                                        <>
-                                            <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
-                                                    Access WebCam
-                                                </button>
-                                            </div>
-                                        </>
                                     )}
                                 </div>
-
-                                {accessWebcam && (
-                                    <div className="w-full md:w-1/3">
-                                        <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
-                                    </div>
-                                )}
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

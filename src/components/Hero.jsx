@@ -9,7 +9,7 @@ const Hero = () => {
     let navigate = useNavigate();
 
     const handlePricingClick = () => {
-        navigate("/pricing");
+        navigate("/main");
     };
 
     const handleRegistrationClick = () => {

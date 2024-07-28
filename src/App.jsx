@@ -12,7 +12,7 @@ const App = () => {
         <>
             <Routes>
                 <Route path="/" element={<Lending />} />
-                <Route path="/pricing" element={<EmoAI />} />
+                <Route path="/main" element={<EmoAI />} />
                 <Route path="/spotify" element={< Spotify  />} />
             </Routes>
             <Analytics />
