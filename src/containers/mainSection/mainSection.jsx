@@ -30,7 +30,7 @@ class MainSection extends Component {
 
         return (
             <div className="main-section">
-                <Header username={name} img={img} />
+                {/*<Header username={name} img={img} />*/}
                 <Modal />
                 <div className="main-section-container">
                     {view === 'browse' ? <Browse /> : null}

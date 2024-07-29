@@ -53,6 +53,21 @@ const EmoAI = ({setToken, fetchUser }) => {
 
     const [selectedMode, setSelectedMode] = useState('photo');
 
+    const [activeMode, setActiveMode] = useState('');
+
+    const handleModeChange = (mode) => {
+        setActiveMode(mode);
+    };
+
+    const handleCreateButtonClick = () => {
+        if (activeMode === 'spotify') {
+            handleConnectSpotify();
+        } else if (activeMode === 'generate') {
+            handleSubmit();
+        }
+    };
+
+
     const toggleMode = (mode) => {
         setSelectedMode(mode);
     };
@@ -112,7 +127,7 @@ const EmoAI = ({setToken, fetchUser }) => {
                     setSpotifyToken(token);
                     setToken(token);
                     fetchUser();
-                    navigate('/pricing', {replace: true});
+                    navigate('/main', {replace: true});
                 }
             });
         }
@@ -154,8 +169,101 @@ const EmoAI = ({setToken, fetchUser }) => {
         navigate("/spotify");
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const CreateButtonSpotify = ({ onClick }) => (
+        <div className="w-full  mt-4">
+            <button
+                aria-label="Create"
+                className="w-full font-sans text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-lg buttonAnimate hover:opacity-90 flex items-center justify-center"
+                onClick={onClick}
+            >
+                <style jsx>{`
+                @keyframes randomBackground {
+                    0% { background-position: 50% 50%; }
+                    25% { background-position: 30% 70%; }
+                    50% { background-position: 70% 30%; }
+                    75% { background-position: 40% 60%; }
+                    100% { background-position: 50% 50%; }
+                }
+                .buttonAnimate {
+                    position: relative;
+                    background-image: url('/download 1.svg');
+                    //background-size: 200% 200%;
+                    background-position: 50% 50%;
+                    transition: background 0.5s ease-in-out;
+                    overflow: hidden;
+                }
+                .buttonAnimate::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image: url('/grain.png');
+                    background-size: cover;
+                    background-repeat: repeat;
+                    opacity: 0.5;
+                    z-index: 1;
+                    pointer-events: none;
+                }
+                .buttonAnimate:hover {
+                    animation: randomBackground 3s linear infinite;
+                }
+            `}</style>
+                <img src="/create-new.svg" alt="icon" className="w-4 h-4 mr-2 filter invert brightness-0" />
+                <span>Connect Spotify</span>
+            </button>
+        </div>
+    )
+
+    const CreateButtonGenerate = ({ onClick }) => (
+        <div className="w-full  mt-4">
+            <button
+                aria-label="Create"
+                className="w-full font-sans text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-lg buttonAnimate hover:opacity-90 flex items-center justify-center"
+                onClick={onClick}
+            >
+                <style jsx>{`
+                @keyframes randomBackground {
+                    0% { background-position: 50% 50%; }
+                    25% { background-position: 30% 70%; }
+                    50% { background-position: 70% 30%; }
+                    75% { background-position: 40% 60%; }
+                    100% { background-position: 50% 50%; }
+                }
+                .buttonAnimate {
+                    position: relative;
+                    background-image: url('/download.svg');
+                    //background-size: 200% 200%;
+                    background-position: 50% 50%;
+                    transition: background 0.5s ease-in-out;
+                    overflow: hidden;
+                }
+                .buttonAnimate::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image: url('/grain.png');
+                    background-size: cover;
+                    background-repeat: repeat;
+                    opacity: 0.5;
+                    z-index: 1;
+                    pointer-events: none;
+                }
+                .buttonAnimate:hover {
+                    animation: randomBackground 3s linear infinite;
+                }
+            `}</style>
+                <img src="/create-new.svg" alt="icon" className="w-4 h-4 mr-2 filter invert brightness-0" />
+                <span>Generate music</span>
+            </button>
+        </div>
+    );
+
+    const handleSubmit = async () => {
         try {
             setIsLoading(true);
             const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
@@ -317,6 +425,9 @@ const EmoAI = ({setToken, fetchUser }) => {
                         </div>
                     </div>
 
+                    {activeMode === 'spotify' && <CreateButtonSpotify onClick={handleCreateButtonClick} />}
+                    {activeMode === 'generate' && <CreateButtonGenerate onClick={handleCreateButtonClick} />}
+
                     <div className="mt-auto pt-6">
                         <h2 className="text-lg font-bold mb-2">Music Controls</h2>
                         <div className="music-player bg-EmoButton p-4 rounded-lg">
@@ -336,9 +447,7 @@ const EmoAI = ({setToken, fetchUser }) => {
                     <Header
                         username={user.display_name || 'User'}
                         img={user.images[0]?.url || '/Spotify_Icon_RGB_Green.png'}
-                        handleSubmit={handleSubmit}
-                        handleConnectSpotify={handleConnectSpotify}
-                        isLoading={isLoading}
+                        onModeChange={handleModeChange}  // Pass the handleModeChange function here
                         toggleMenu={toggleMenu}
                     />
 
