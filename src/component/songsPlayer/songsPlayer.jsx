@@ -8,9 +8,20 @@ import SongSider from './components/songSider';
 import VolumeControl from './components/volumeControl';
 import withPlayer from '../../hoc/playerHoc';
 import TrackCover from "../trackCover/trackCover.jsx";
+import { playEmotionSong, songEnded } from '../../store/actions/playerActions';
 
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
+
+    componentDidUpdate(prevProps) {
+        const { currentSong, trackPosition, songEnded } = this.props;
+        const position = this.toSeconds(trackPosition) || 0;
+        const duration = currentSong ? this.toSeconds(currentSong.duration_ms) : 1;
+
+        if (prevProps.trackPosition !== trackPosition && position >= duration) {
+            songEnded();
+        }
+    }
 
     render = () => {
         const { currentSong, trackPosition, contains, seekSong } = this.props;
@@ -56,6 +67,12 @@ const mapStateToProps = (state) => ({
     currentSong: state.playerReducer.currentSong,
     trackPosition: state.playerReducer.trackPosition,
     contains: state.libraryReducer.containsCurrent,
+    currentEmotion: state.playerReducer.currentEmotion,
 });
 
-export default connect(mapStateToProps)(withPlayer(SongsPlayer));
+const mapDispatchToProps = {
+    playEmotionSong,
+    songEnded
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withPlayer(SongsPlayer));

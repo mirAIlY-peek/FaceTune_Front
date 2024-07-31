@@ -156,7 +156,7 @@ const classifySongEmotions = async (songs) => {
     genres: song.genres.join(', ')
   }));
 
-  const prompt = `Classify the following songs into 7 emotions: angry, sad, disgust, fear, surprise, happy, neutral. Return the results as a JSON object with emotion categories as keys and arrays of song IDs as values. Songs:\n${JSON.stringify(songData, null, 2)}`;
+  const prompt = `Classify the following songs into 7 emotions: angry, sad, disgust, fear, surprise, happy, neutral. Return the results as a JSON object with emotion categories as keys and arrays of song IDs as values. Do not include any additional text. Songs:\n${JSON.stringify(songData, null, 2)}`;
 
   try {
     const response = await backendApi.post('/chat', { prompt });

@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import UserHeader from '../userDetails/userDetails';
 import './header.css';
 
 const Header = ({ username, img, onModeChange, toggleMenu }) => {
+    const [activeMode, setActiveMode] = useState('');
+
+    const handleModeChange = (mode) => {
+        setActiveMode(mode);
+        onModeChange(mode);
+    };
+
     return (
         <div className="main-header bg-emo bg-opacity-60 p-4 rounded-xl flex items-center justify-between">
             <div className="flex space-x-6">
@@ -11,15 +18,15 @@ const Header = ({ username, img, onModeChange, toggleMenu }) => {
                 </button>
                 <div className="flex items-center space-x-2">
                     <button
-                        onClick={() => onModeChange('spotify')}
-                        className="font-semibold focus:outline-none text-gray-400 hover:text-green-500"
+                        onClick={() => handleModeChange('spotify')}
+                        className={`font-semibold focus:outline-none ${activeMode === 'spotify' ? 'text-green-500' : 'text-gray-400 hover:text-green-500'}`}
                     >
                         From Spotify
                     </button>
                     <span className="text-gray-400">|</span>
                     <button
-                        onClick={() => onModeChange('generate')}
-                        className="font-semibold focus:outline-none text-gray-400 hover:text-purple-400"
+                        onClick={() => handleModeChange('generate')}
+                        className={`font-semibold focus:outline-none ${activeMode === 'generate' ? 'text-purple-400' : 'text-gray-400 hover:text-purple-400'}`}
                     >
                         Generate Music
                     </button>

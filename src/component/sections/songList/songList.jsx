@@ -1,77 +1,99 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
     fetchSongs,
     fetchRecentSongs,
-    fetchMoreSongs
+    fetchMoreSongs,
 } from '../../../store/actions/libraryActions';
-import { playSong, pauseSong } from '../../../store/actions/playerActions';
+import { playSong, pauseSong } from '../../../store/actions/playerActions.js'
 import Playlist from '../../songsTable/playlistTable/playlistTable';
 import Header from '../../header/songsHeader';
 import Spinner from '../../spinner/spinner';
 
-class Songs extends Component {
+const Songs = ({
+                   fetchSongs,
+                   fetchRecentSongs,
+                   playSong,
+                   pauseSong,
+                   songs,
+                   fetching,
+                   playing,
+                   currentSong,
+                   next,
+                   fetchMoreSongs,
+                   recently,
+                   currentEmotion,
+                   emotionSongMap,
+                   fetchPlayerState
+               }) => {
+    const [lastPlayedEmotion, setLastPlayedEmotion] = useState(null);
 
+    useEffect(() => {
+        fetchSongs();
+    }, [fetchSongs]);
 
+    const playEmotionBasedSong = useCallback(() => {
+        console.log('Current Emotion:', currentEmotion);
+        console.log('Emotion Song Map:', emotionSongMap);
+        if (currentEmotion && emotionSongMap) {
+            const emotionSongIds = emotionSongMap[currentEmotion.toLowerCase()];
+            console.log(`Found ${emotionSongIds ? emotionSongIds.length : 0} songs for emotion: ${currentEmotion}`);
 
-    async componentDidMount() {
-        await this.fetchSongs();
-        this.logAllSongs();
-    }
+            if (emotionSongIds && emotionSongIds.length > 0) {
+                const randomSongId = emotionSongIds[Math.floor(Math.random() * emotionSongIds.length)];
+                console.log('Selected song ID:', randomSongId);
 
-    fetchSongs() {
-        const { recently, fetchRecentSongs, fetchSongs } = this.props;
-        if (recently) {
-            return fetchRecentSongs();
-        } else {
-            return fetchSongs();
+                const songUri = `spotify:track:${randomSongId}`;
+                console.log('Playing song with URI:', songUri);
+                playSong([songUri]);
+                setLastPlayedEmotion(currentEmotion);
+            } else {
+                console.log('No songs found for the current emotion');
+            }
         }
-    }
+    }, [currentEmotion, emotionSongMap, playSong]);
 
-    logAllSongs() {
-        console.log('All songs:', this.props.songs);
+    useEffect(() => {
+        if (currentEmotion !== lastPlayedEmotion) {
+            playEmotionBasedSong();
+        }
+    }, [currentEmotion, lastPlayedEmotion, playEmotionBasedSong]);
 
-        // Добавляем вывод статистики по эмоциям
-        const emotionStats = this.props.songs.reduce((acc, song) => {
-            acc[song.emotion] = (acc[song.emotion] || 0) + 1;
-            return acc;
-        }, {});
-        console.log('Emotion statistics:', emotionStats);
-    }
+    useEffect(() => {
+        if (!playing && currentSong) {
+            // Когда текущая песня заканчивается, воспроизводим следующую
+            playEmotionBasedSong();
+        }
+    }, [playing, currentSong, playEmotionBasedSong]);
 
-    playTracks = (context, offset) => {
-        const { songs, playSong } = this.props;
+    const playTracks = (context, offset) => {
         const songUris = songs.slice(offset).map(s => s.track ? s.track.uri : s.uri);
         playSong(songUris, offset);
     };
 
-    render() {
-        const { fetching, songs, pauseSong, playing, currentSong, next, fetchMoreSongs, recently } = this.props;
-
-        return (
-            <Spinner section loading={fetching}>
-                <div className="player-container">
-                    <Header
-                        title={recently ? 'Recently Played' : 'Songs'}
-                        playSong={() => this.playTracks(songs, 0)}
-                        pauseSong={pauseSong}
-                        playing={playing}
-                    />
-                    <Playlist
-                        songs={songs}
-                        playSong={this.playTracks}
-                        pauseSong={pauseSong}
-                        current={currentSong}
-                        playing={playing}
-                        more={!!next}
-                        fetchMoreSongs={fetchMoreSongs}
-                    />
-                </div>
-            </Spinner>
-        );
-    }
-}
+    return (
+        <Spinner section loading={fetching}>
+            <div className="player-container">
+                <Header
+                    title={recently ? 'Recently Played' : 'Songs'}
+                    playSong={() => playTracks(songs, 0)}
+                    pauseSong={pauseSong}
+                    playing={playing}
+                />
+                <Playlist
+                    songs={songs}
+                    playSong={playTracks}
+                    pauseSong={pauseSong}
+                    current={currentSong}
+                    playing={playing}
+                    more={!!next}
+                    fetchMoreSongs={fetchMoreSongs}
+                />
+            </div>
+        </Spinner>
+    );
+};
 
 const mapStateToProps = state => ({
     songs: state.libraryReducer.songs ? state.libraryReducer.songs.items : [],
@@ -79,7 +101,8 @@ const mapStateToProps = state => ({
     fetching: state.libraryReducer.fetchSongsPending,
     next: state.libraryReducer.songs ? state.libraryReducer.songs.next : false,
     currentSong: state.playerReducer.currentSong,
-    playing: state.playerReducer.playing
+    playing: state.playerReducer.playing,
+    emotionSongMap: state.libraryReducer.emotionSongMap,
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators(

@@ -1,24 +1,59 @@
 import axios from '../../axios.jsx';
 
-export const setStatus = status => {
-  return {
-    type: 'FETCH_STATUS_SUCCESS',
-    status
-  };
+export const setStatus = status => ({
+  type: 'FETCH_STATUS_SUCCESS',
+  status
+});
+
+export const setCurrentEmotion = emotion => ({
+  type: 'SET_CURRENT_EMOTION',
+  emotion
+});
+
+export const playEmotionSong = (emotion) => async (dispatch, getState) => {
+  try {
+    console.log(`Attempting to play song for emotion: ${emotion}`);
+    const state = getState();
+    const allSongs = state.libraryReducer.songs.items;
+    console.log(`Total songs in library: ${allSongs.length}`);
+    const emotionSongs = allSongs.filter(song => song.emotion.toLowerCase() === emotion.toLowerCase());
+    console.log(`Songs matching emotion ${emotion}: ${emotionSongs.length}`);
+
+    if (emotionSongs.length === 0) {
+      console.log(`No songs found for emotion: ${emotion}`);
+      return;
+    }
+
+    const randomSong = emotionSongs[Math.floor(Math.random() * emotionSongs.length)];
+    const songId = randomSong.track.id;
+
+    console.log(`Selected song for emotion ${emotion}: ${songId} (${randomSong.track.name})`);
+
+    await dispatch(playSong([`spotify:track:${songId}`], songId));
+    dispatch(setCurrentEmotion(emotion));
+  } catch (error) {
+    console.error('Error in playEmotionSong:', error);
+  }
 };
 
-export const nextSong = () => {
-  axios.post('/me/player/next');
-  return {
-    type: 'CHANGE_SONG'
-  };
+export const checkAndPlayNextEmotionSong = () => async (dispatch, getState) => {
+  const state = getState();
+  const { currentEmotion } = state.playerReducer;
+
+  if (currentEmotion) {
+    await dispatch(playEmotionSong(currentEmotion));
+  }
 };
 
-export const previousSong = () => {
-  axios.post('/me/player/previous');
-  return {
-    type: 'CHANGE_SONG'
-  };
+export const nextSong = () => async dispatch => {
+  await axios.post('/me/player/next');
+  dispatch({ type: 'CHANGE_SONG' });
+  dispatch(checkAndPlayNextEmotionSong());
+};
+
+export const previousSong = () => async dispatch => {
+  await axios.post('/me/player/previous');
+  dispatch({ type: 'CHANGE_SONG' });
 };
 
 export const playSong = (uris, songId) => async (dispatch, getState) => {
@@ -29,7 +64,7 @@ export const playSong = (uris, songId) => async (dispatch, getState) => {
     console.log('Trying to play song with ID:', songId);
 
     const songIndex = allSongs.findIndex(song => (song.track ? song.track.id : song.id) === songId);
-
+    console.log("Found song index", songIndex);
     if (songIndex === -1) {
       console.error('Song not found in the list');
       console.log('Available song IDs:', allSongs.map(song => song.track ? song.track.id : song.id));
@@ -38,7 +73,7 @@ export const playSong = (uris, songId) => async (dispatch, getState) => {
 
     const response = await axios.put('/me/player/play', {
       uris: uris,
-      offset: { position: songIndex }
+      // offset: { position: songIndex },
     });
 
     console.log('Play response:', response);
@@ -47,16 +82,14 @@ export const playSong = (uris, songId) => async (dispatch, getState) => {
   } catch (error) {
     console.error('Error in playSong:', error.response?.data || error.message);
 
-    // Проверка на отсутствие активного устройства
     if (error.response?.status === 404) {
       console.error('No active device found');
-      // Здесь можно диспатчить action для показа уведомления пользователю
       dispatch({ type: 'NO_ACTIVE_DEVICE' });
     } else {
       dispatch({ type: 'PLAY_ERROR', payload: error.response?.data || error.message });
     }
 
-    throw error; // Прокидываем ошибку дальше для обработки в компоненте
+    throw error;
   }
 };
 
@@ -77,11 +110,15 @@ export const pauseSong = () => {
   };
 };
 
-export const seekSong = ms => {
+export const seekSong = ms => dispatch => {
   axios.put(`/me/player/seek?position_ms=${ms}`);
-  return {
-    type: 'SEEK_SONG'
-  };
+  dispatch({ type: 'SEEK_SONG' });
+};
+
+// Add this new action
+export const songEnded = () => dispatch => {
+  dispatch({ type: 'SONG_ENDED' });
+  dispatch(checkAndPlayNextEmotionSong());
 };
 
 export const repeatContext = status => {
@@ -90,6 +127,7 @@ export const repeatContext = status => {
     type: 'REPEAT'
   };
 };
+
 
 export const shuffle = status => {
   axios.put(`/me/player/shuffle?state=${status}`);

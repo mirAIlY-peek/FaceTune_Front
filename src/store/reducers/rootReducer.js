@@ -8,8 +8,9 @@ import libraryReducer from './libraryReducer';
 import uiReducer from './uiReducer';
 import artistReducer from './artistReducer';
 import albumReducer from './albumReducer';
-import playerReducer from './playerReducer';
+import playerReducer from './playerReducer.js';
 import searchReducer from './searchReducer';
+import emotionReducer from "./emotionReducer.js";
 
 export default combineReducers({
   sessionReducer,
@@ -20,6 +21,7 @@ export default combineReducers({
   uiReducer,
   artistReducer,
   albumReducer,
-  playerReducer,
-  searchReducer
+  searchReducer,
+  emotionReducer,
+  playerReducer
 });
