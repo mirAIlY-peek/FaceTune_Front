@@ -31,10 +31,16 @@ export const playEmotionSong = (emotion) => async (dispatch, getState) => {
 
     await dispatch(playSong([`spotify:track:${songId}`], songId));
     dispatch(setCurrentEmotion(emotion));
+    dispatch({ type: 'PLAY_STATE' });
   } catch (error) {
     console.error('Error in playEmotionSong:', error);
   }
 };
+
+export const setPlayingState = (isPlaying) => ({
+  type: 'SET_PLAYING_STATE',
+  payload: isPlaying
+});
 
 export const checkAndPlayNextEmotionSong = () => async (dispatch, getState) => {
   const state = getState();
@@ -115,10 +121,26 @@ export const seekSong = ms => dispatch => {
   dispatch({ type: 'SEEK_SONG' });
 };
 
+export const updateCurrentEmotion = (emotion) => (dispatch, getState) => {
+  const currentEmotion = getState().playerReducer.currentEmotion;
+  if (emotion !== currentEmotion) {
+    dispatch(setCurrentEmotion(emotion));
+  }
+};
+
 // Add this new action
-export const songEnded = () => dispatch => {
+export const songEnded = () => (dispatch, getState) => {
+  console.log("songEnded action creator called");
   dispatch({ type: 'SONG_ENDED' });
-  dispatch(checkAndPlayNextEmotionSong());
+
+  // Add a slight delay before playing the next song
+  setTimeout(() => {
+    const state = getState();
+    const { currentEmotion } = state.playerReducer;
+    if (currentEmotion) {
+      dispatch(playEmotionSong(currentEmotion));
+    }
+  }, 1000); // 1 second delay
 };
 
 export const repeatContext = status => {

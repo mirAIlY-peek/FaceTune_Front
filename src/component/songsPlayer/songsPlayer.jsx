@@ -8,17 +8,24 @@ import SongSider from './components/songSider';
 import VolumeControl from './components/volumeControl';
 import withPlayer from '../../hoc/playerHoc';
 import TrackCover from "../trackCover/trackCover.jsx";
-import { playEmotionSong, songEnded } from '../../store/actions/playerActions';
+import { playEmotionSong, songEnded, playSong } from '../../store/actions/playerActions';
 
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
 
     componentDidUpdate(prevProps) {
-        const { currentSong, trackPosition, songEnded } = this.props;
+        const { currentSong, trackPosition, songEnded, playing } = this.props;
         const position = this.toSeconds(trackPosition) || 0;
         const duration = currentSong ? this.toSeconds(currentSong.duration_ms) : 1;
 
         if (prevProps.trackPosition !== trackPosition && position >= duration) {
+            console.log("Song ended, dispatching songEnded action");
+            songEnded();
+        }
+
+        // Add this check
+        if (prevProps.playing && !playing) {
+            console.log("Playing state changed to false, dispatching songEnded action");
             songEnded();
         }
     }
@@ -68,11 +75,13 @@ const mapStateToProps = (state) => ({
     trackPosition: state.playerReducer.trackPosition,
     contains: state.libraryReducer.containsCurrent,
     currentEmotion: state.playerReducer.currentEmotion,
+    playing: state.playerReducer.playing,
 });
 
 const mapDispatchToProps = {
     playEmotionSong,
-    songEnded
+    songEnded,
+    playSong
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withPlayer(SongsPlayer));
