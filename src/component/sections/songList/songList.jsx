@@ -39,8 +39,8 @@ const Songs = ({
 
 
     const playEmotionBasedSong = useCallback(() => {
-        console.log('Current Emotion:', currentEmotion);
-        console.log('Emotion Song Map:', emotionSongMap);
+        // console.log('Current Emotion:', currentEmotion);
+        // console.log('Emotion Song Map:', emotionSongMap);
         if (currentEmotion && emotionSongMap && !isCurrentlyPlaying) {
             const emotionSongIds = emotionSongMap[currentEmotion.toLowerCase()];
             console.log(`Found ${emotionSongIds ? emotionSongIds.length : 0} songs for emotion: ${currentEmotion}`);

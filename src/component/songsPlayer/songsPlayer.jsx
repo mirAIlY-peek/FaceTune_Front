@@ -8,7 +8,7 @@ import SongSider from './components/songSider';
 import VolumeControl from './components/volumeControl';
 import withPlayer from '../../hoc/playerHoc';
 import TrackCover from "../trackCover/trackCover.jsx";
-import { playEmotionSong, songEnded, playSong, pauseSong, resumeSong} from '../../store/actions/playerActions';
+import { playEmotionSong, songEnded, playSong, pauseSong, resumeSong, nextSong, previousSong } from '../../store/actions/playerActions';
 
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
@@ -64,7 +64,12 @@ class SongsPlayer extends Component {
                     />
                 </div>
                 <div className="player-center">
-                    <SongsControl {...this.props} handlePlayPause={this.handlePlayPause} />
+                    <SongsControl
+                        {...this.props}
+                        handlePlayPause={this.handlePlayPause}
+                        nextSong={this.props.nextSong}
+                        previousSong={this.props.previousSong}
+                    />
                     <SongSider
                         isEnabled={true}
                         value={position / duration}
@@ -97,6 +102,8 @@ const mapDispatchToProps = {
     playSong,
     pauseSong,
     resumeSong,
+    nextSong,
+    previousSong,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withPlayer(SongsPlayer));

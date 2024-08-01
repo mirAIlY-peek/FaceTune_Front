@@ -52,14 +52,21 @@ export const checkAndPlayNextEmotionSong = () => async (dispatch, getState) => {
 };
 
 export const nextSong = () => async dispatch => {
-  await axios.post('/me/player/next');
-  dispatch({ type: 'CHANGE_SONG' });
-  dispatch(checkAndPlayNextEmotionSong());
+  try {
+    await axios.post('/me/player/next');
+    dispatch({ type: 'CHANGE_SONG' });
+  } catch (error) {
+    console.error('Error playing next song:', error);
+  }
 };
 
 export const previousSong = () => async dispatch => {
-  await axios.post('/me/player/previous');
-  dispatch({ type: 'CHANGE_SONG' });
+  try {
+    await axios.post('/me/player/previous');
+    dispatch({ type: 'CHANGE_SONG' });
+  } catch (error) {
+    console.error('Error playing previous song:', error);
+  }
 };
 
 export const playSong = (uris, songId) => async (dispatch, getState) => {
@@ -142,13 +149,12 @@ export const songEnded = () => (dispatch, getState) => {
   // Add a slight delay before playing the next song
   setTimeout(() => {
     const state = getState();
-    const { currentEmotion } = state.playerReducer;
-    if (currentEmotion) {
+    const { currentEmotion, isPaused } = state.playerReducer;
+    if (currentEmotion && !isPaused) {
       dispatch(playEmotionSong(currentEmotion));
     }
   }, 1000); // 1 second delay
 };
-
 export const repeatContext = status => {
   axios.put(`/me/player/repeat?state=${status}`);
   return {
@@ -165,8 +171,12 @@ export const shuffle = status => {
 };
 
 export const resumeSong = () => async (dispatch) => {
-  await axios.put('/me/player/play');
-  dispatch({
-    type: 'PLAY_STATE'
-  });
+  try {
+    await axios.put('/me/player/play');
+    dispatch({
+      type: 'RESUME_STATE'
+    });
+  } catch (error) {
+    console.error('Error resuming song:', error);
+  }
 };

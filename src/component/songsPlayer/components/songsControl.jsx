@@ -10,11 +10,11 @@ const songsControl = props => (
       className={'shuffle-song' + (props.shuffleActive ? ' active' : '')}
       icon="fa-random"
     />
-    <Button
-      className="back-song"
-      icon="fa-step-backward reverse"
-      onClick={props.previousSong}
-    />
+      <Button
+          className="back-song"
+          icon="fa-step-backward reverse"
+          onClick={props.previousSong}
+      />
       <Button
           className="play-btn"
           onClick={props.handlePlayPause}
@@ -24,11 +24,11 @@ const songsControl = props => (
           playBtn
       />
 
-    <Button
-      className="next-song"
-      icon="fa-step-forward forward"
-      onClick={props.nextSong}
-    />
+      <Button
+          className="next-song"
+          icon="fa-step-forward forward"
+          onClick={props.nextSong}
+      />
     <Button
       onClick={() =>
         props.repeatContext(props.repeatActive ? 'off' : 'context')

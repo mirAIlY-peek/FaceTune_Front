@@ -206,7 +206,7 @@
                     className="w-full font-sans text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-lg buttonAnimate hover:opacity-90 flex items-center justify-center"
                     onClick={onClick}
                 >
-                    <style jsx>{`
+                    <style jsx="true">{`
                     @keyframes randomBackground {
                         0% { background-position: 50% 50%; }
                         25% { background-position: 30% 70%; }
@@ -253,7 +253,7 @@
                     className="w-full font-sans text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-lg buttonAnimate hover:opacity-90 flex items-center justify-center"
                     onClick={onClick}
                 >
-                    <style jsx>{`
+                    <style jsx="true">{`
                     @keyframes randomBackground {
                         0% { background-position: 50% 50%; }
                         25% { background-position: 30% 70%; }
@@ -527,9 +527,9 @@
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
-                                                <div className="w-full md:w-2/3">
-                                                    <div className="video-container w-full h-64 md:h-96 rounded-lg overflow-hidden">
+                                            <div className="flex flex-col justify-center md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
+                                                <div className="w-full md:w-2/4">
+                                                    <div className="video-container w-full h-64 md:h-80 rounded-lg overflow-hidden">
                                                         <div style={{
                                                             position: "relative",
                                                             width: "100%",
@@ -548,7 +548,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div className="w-full md:w-1/3">
+                                                <div className="w-full md:w-1/3 place-content-center">
                                                     <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
                                                 </div>
                                             </div>

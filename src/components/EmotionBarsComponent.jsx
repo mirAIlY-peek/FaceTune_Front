@@ -65,7 +65,9 @@ const EmotionBarsComponent = () => {
                 <SingleBarComponent name="Neutral" color1="#A9A9A9" color2="#737373" value = {neutral}></SingleBarComponent>
             </div>
             {/*<MoodComponent/>*/}
-            <DominantEmotionComponent/>
+            {/*<div className="hidden">*/}
+                <DominantEmotionComponent/>
+            {/*</div>*/}
         </>
 
     );
