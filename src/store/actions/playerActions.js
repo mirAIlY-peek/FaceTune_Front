@@ -109,11 +109,17 @@ export const playTracks = (tracks, offset) => {
   };
 };
 
-export const pauseSong = () => {
-  axios.put('/me/player/pause');
-  return {
-    type: 'PAUSE_STATE'
-  };
+export const pauseSong = () => async (dispatch, getState) => {
+  try {
+    await axios.put('/me/player/pause');
+    const { trackPosition } = getState().playerReducer;
+    dispatch({
+      type: 'PAUSE_STATE',
+      payload: trackPosition
+    });
+  } catch (error) {
+    console.error('Error pausing song:', error);
+  }
 };
 
 export const seekSong = ms => dispatch => {
@@ -156,4 +162,11 @@ export const shuffle = status => {
   return {
     type: 'Shuffle'
   };
+};
+
+export const resumeSong = () => async (dispatch) => {
+  await axios.put('/me/player/play');
+  dispatch({
+    type: 'PLAY_STATE'
+  });
 };

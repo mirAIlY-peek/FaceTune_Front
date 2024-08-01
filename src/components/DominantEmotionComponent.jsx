@@ -51,8 +51,11 @@ const GenderComponent = ({ playEmotionSong, songEnded, setCurrentEmotion, playin
     if (playing) {
       setIsEmotionFrozen(true);
     } else {
-      setIsEmotionFrozen(false);
-      songEnded();
+
+        setIsEmotionFrozen(false);
+        songEnded();
+
+
     }
   }, [playing, songEnded]);
 

@@ -10,11 +10,17 @@ const playerReducer = (state = initialState, action) => {
         status: action.status
       };
     case 'PLAY_STATE':
-      console.log("PLAY_STATE action received in reducer");
       return {
         ...state,
         playing: true,
-        isEmotionFrozen: true
+        isEmotionFrozen: true,
+        pausedPosition: null
+      };
+    case 'PAUSE_STATE':
+      return {
+        ...state,
+        playing: false,
+        pausedPosition: state.trackPosition
       };
     case 'SONG_ENDED':
       console.log("SONG_ENDED action received in reducer");

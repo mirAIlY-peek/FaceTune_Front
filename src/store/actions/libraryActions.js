@@ -97,7 +97,7 @@ export const fetchSongs = () => {
         console.log('Next URL:', nextUrl);
       }
 
-      const shuffledSongs = allSongs.sort(() => 0.5 - Math.random()).slice(0, 10);
+      const shuffledSongs = allSongs.sort(() => 0.5 - Math.random()).slice(0, 50);
 
       const artistIds = [...new Set(shuffledSongs.map(song => song.track.artists[0].id))];
 

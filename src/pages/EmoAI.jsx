@@ -492,7 +492,7 @@
 
                             {/*<PhotoTrackerAnalyzer/>*/}
 
-                            <div className="flex flex-col items-center overflow-hidden bg-emo rounded-xl p-4">
+                            <div className="flex flex-col items-center overflow-hidden bg-emo rounded-xl p-4 w-full">
                                 <h2 className="text-2xl font-bold mb-2 text-center">Emotion Analysis</h2>
                                 <p className="mb-4 text-sm text-center">
                                     Choose to upload a photo or use your webcam for real-time emotion analysis.
@@ -516,41 +516,41 @@
                                 {selectedMode === 'photo' ? (
                                     <PhotoTrackerAnalyzer />
                                 ) : (
-                                    <div className="flex flex-col items-center justify-start w-full max-w-4xl">
-                                        <div className="relative w-full max-w-md h-64 mb-4">
-                                            {accessWebcam ? (
-                                                <div className="video-container w-full h-full rounded-lg overflow-hidden">
-                                                    <div style={{
-                                                        position: "relative",
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        overflow: "hidden"
-                                                    }}>
-                                                        <video id="videoEl" autoPlay style={{
-                                                            position: "absolute",
+                                    <div className="w-full max-w-6xl">
+                                        {!accessWebcam ? (
+                                            <div className="relative w-full h-64 mb-4">
+                                                <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
+                                                        Access WebCam
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
+                                                <div className="w-full md:w-2/3">
+                                                    <div className="video-container w-full h-64 md:h-96 rounded-lg overflow-hidden">
+                                                        <div style={{
+                                                            position: "relative",
                                                             width: "100%",
                                                             height: "100%",
-                                                            objectFit: "cover",
-                                                            transform: "scaleX(-1)"
-                                                        }} playsInline></video>
-                                                        <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
+                                                            overflow: "hidden"
+                                                        }}>
+                                                            <video id="videoEl" autoPlay style={{
+                                                                position: "absolute",
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                transform: "scaleX(-1)"
+                                                            }} playsInline></video>
+                                                            <FaceTrackerComponent videoEl={videoEl}></FaceTrackerComponent>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            ) : (
-                                                <>
-                                                    <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
-                                                            Access WebCam
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
 
-                                        {accessWebcam && (
-                                            <div className="w-full max-w-md mt-4">
-                                                <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
+                                                <div className="w-full md:w-1/3">
+                                                    <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -558,26 +558,27 @@
                             </div>
                         </div>
                     </div>
+                    <div className="hidden">
+                        {showSpotifyComponents && (
+                            <WebPlaybackReact {...webPlaybackSdkProps}>
+                                {playerLoaded ? (
+                                    <>
+                                        {/*<LeftSection/>*/}
 
-                    {showSpotifyComponents && (
-                        <WebPlaybackReact {...webPlaybackSdkProps}>
-                            {playerLoaded ? (
-                                <>
-                                    {/*<LeftSection/>*/}
-
-                                    {/*<MainSection/>*/}
-                                    <GenderComponent  />
-                                    <Songs
-                                        currentEmotion={currentEmotion}
-                                        shouldPlaySpotify={shouldPlaySpotify}
-                                        setShouldPlaySpotify={setShouldPlaySpotify}
-                                    />
-                                </>
-                            ) : (
-                                <Loader/>
-                            )}
-                        </WebPlaybackReact>
-                    )}
+                                        {/*<MainSection/>*/}
+                                        <GenderComponent  />
+                                        <Songs
+                                            currentEmotion={currentEmotion}
+                                            shouldPlaySpotify={shouldPlaySpotify}
+                                            setShouldPlaySpotify={setShouldPlaySpotify}
+                                        />
+                                    </>
+                                ) : (
+                                    <Loader/>
+                                )}
+                            </WebPlaybackReact>
+                        )}
+                    </div>
                 </div>
             </>
         );
