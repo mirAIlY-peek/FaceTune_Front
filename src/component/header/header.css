@@ -1,0 +1,13 @@
+.main-header {
+  background: rgb(24, 24, 24);
+  width: 100%;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    padding: 15px;
+  }
+}
