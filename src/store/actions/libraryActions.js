@@ -2,7 +2,7 @@ import axios from '../../axios.jsx';
 import axioss from 'axios';
 
 const backendApi = axioss.create({
-  baseURL: 'http://localhost:3000'
+  baseURL: 'https://facetune-back.onrender.com'
 });
 
 const fetchSongsPending = () => ({

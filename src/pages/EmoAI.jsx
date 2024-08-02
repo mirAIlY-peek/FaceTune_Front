@@ -312,7 +312,7 @@
         const handleSubmit = async () => {
             try {
                 setIsLoading(true);
-                const sunoApiResponse = await axios.post('http://localhost:3000/api/generate', {
+                const sunoApiResponse = await axios.post('https://facetune-back.onrender.com/api/generate', {
                     prompt: "Create super sad music capturing the pain and sadness of a breakup. Slow tempo, melancholic melody, piano, strings, soft vocals. Mood: loneliness, sorrow, reflection.\n",
                     wait_audio: true
                 });
