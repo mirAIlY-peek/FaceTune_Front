@@ -61,12 +61,8 @@ export const nextSong = () => async dispatch => {
 };
 
 export const previousSong = () => async dispatch => {
-  try {
-    await axios.post('/me/player/previous');
-    dispatch({ type: 'CHANGE_SONG' });
-  } catch (error) {
-    console.error('Error playing previous song:', error);
-  }
+  await axios.post('/me/player/previous');
+  dispatch({ type: 'CHANGE_SONG' });
 };
 
 export const playSong = (uris, songId) => async (dispatch, getState) => {
@@ -143,7 +139,7 @@ export const updateCurrentEmotion = (emotion) => (dispatch, getState) => {
 
 // Add this new action
 export const songEnded = () => (dispatch, getState) => {
-  console.log("songEnded action creator called");
+  // console.log("songEnded action creator called");
   dispatch({ type: 'SONG_ENDED' });
 
   // Add a slight delay before playing the next song

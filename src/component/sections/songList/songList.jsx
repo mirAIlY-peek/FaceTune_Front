@@ -12,7 +12,7 @@ import Header from '../../header/songsHeader';
 import Spinner from '../../spinner/spinner';
 
 const Songs = ({
-                   fetchSongs,
+                   // fetchSongs,
                    fetchRecentSongs,
                    playSong,
                    pauseSong,
@@ -30,9 +30,9 @@ const Songs = ({
     const [lastPlayedEmotion, setLastPlayedEmotion] = useState(null);
     const [isCurrentlyPlaying, setIsCurrentlyPlaying] = useState(false);
 
-    useEffect(() => {
-        fetchSongs();
-    }, [fetchSongs]);
+    // useEffect(() => {
+    //     fetchSongs();
+    // }, [fetchSongs]);
 
 
 
@@ -120,7 +120,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => bindActionCreators(
     {
-        fetchSongs,
+        // fetchSongs,
         fetchRecentSongs,
         fetchMoreSongs,
         playSong,

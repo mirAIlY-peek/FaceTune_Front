@@ -2,6 +2,8 @@ const initialState = {
   // ... other initial state properties
   currentEmotion: null,
   isPaused: false,
+  playHistory: [],
+  currentIndex: -1,
 };
 
 const playerReducer = (state = initialState, action) => {
@@ -26,7 +28,7 @@ const playerReducer = (state = initialState, action) => {
         pausedPosition: state.trackPosition
       };
     case 'SONG_ENDED':
-      console.log("SONG_ENDED action received in reducer");
+      // console.log("SONG_ENDED action received in reducer");
       return {
         ...state,
         playing: false,
@@ -42,6 +44,17 @@ const playerReducer = (state = initialState, action) => {
         ...state,
         playing: true,
         isPaused: false
+      };
+    case 'ADD_TO_HISTORY':
+      return {
+        ...state,
+        playHistory: [...state.playHistory, action.payload],
+        currentIndex: state.currentIndex + 1,
+      };
+    case 'SET_CURRENT_INDEX':
+      return {
+        ...state,
+        currentIndex: action.payload,
       };
     default:
       return state;

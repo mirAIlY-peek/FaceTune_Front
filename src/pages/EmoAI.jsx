@@ -26,10 +26,10 @@
     import PhotoTrackerAnalyzer from "../components/PhotoEmotionAnalyzer.jsx"
     import Songs from "../component/sections/songList/songList.jsx";
     import GenderComponent from "../components/DominantEmotionComponent.jsx";
-
+    import { fetchSongs } from '../store/actions/libraryActions';
     // import Tooltips from "../components/Tooltips.jsx";
 
-    const EmoAI = ({setToken, fetchUser }) => {
+    const EmoAI = ({setToken, fetchUser ,fetchSongs }) => {
         const [user, setUser] = useState({ display_name: '', images: [] });
 
 
@@ -60,6 +60,7 @@
         const [shouldPlaySpotify, setShouldPlaySpotify] = useState(false);
 
         const [currentEmotion, setCurrentEmotion] = useState(null);
+
 
 
 
@@ -161,6 +162,19 @@
             }
         }, [setToken, fetchUser, navigate]);
 
+        useEffect(() => {
+            const accessToken = localStorage.getItem('spotify_access_token');
+            if (accessToken) {
+                const timer = setTimeout(() => {
+                    fetchSongs();
+                }, 10); // 5000 миллисекунд = 5 секунд
+
+                // Очистка таймера при размонтировании компонента
+                return () => clearTimeout(timer);
+            }
+        }, [fetchUser]);
+
+
         const handleConnectSpotify = () => {
             if (!spotifyToken) {
                 Login.logInWithSpotify();
@@ -169,6 +183,8 @@
                 setShouldPlaySpotify(true);
             }
         };
+
+
 
         const webPlaybackSdkProps = {
             playerName: 'Spotify React Player',
@@ -360,6 +376,7 @@
         const handleAccessWebcam = () => {
             setAccessWebcam(true);
         };
+
 
 
 
@@ -586,10 +603,12 @@
     const mapStateToProps = (state) => ({
         token: state.sessionReducer.token,
         currentEmotion: state.playerReducer.currentEmotion,
+
     });
 
     const mapDispatchToProps = (dispatch) => ({
         setToken: (token) => dispatch(setToken(token)),
         fetchUser: () => dispatch(fetchUser()),
+        fetchSongs: () => dispatch(fetchSongs())
     });
     export default connect(mapStateToProps, mapDispatchToProps)(EmoAI);
