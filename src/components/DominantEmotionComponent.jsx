@@ -7,7 +7,8 @@ import {
   updateCurrentEmotion,
   playSong,
   pauseSong,
-  resumeSong
+  resumeSong,
+    setEmotionBuffer
 } from '../store/actions/playerActions.js';
 
 const GenderComponent = ({
@@ -51,6 +52,12 @@ const GenderComponent = ({
       songEnded();
     }
   }, [playing, isPaused, songEnded]);
+
+    useEffect(() => {
+        if (emotionBuffer) {
+            setEmotionBuffer(emotionBuffer); // Update Redux state when emotionBuffer changes
+        }
+    }, [emotionBuffer, setEmotionBuffer]);
 
   const handleEmotionEvent = (evt) => {
     if (!isPaused && !playing) {
@@ -102,6 +109,7 @@ const mapDispatchToProps = (dispatch) => ({
   updateCurrentEmotion: (emotion) => dispatch(updateCurrentEmotion(emotion)),
   pauseSong: () => dispatch(pauseSong()),
   resumeSong: () => dispatch(resumeSong()),
+    setEmotionBuffer: (emotion) => dispatch(setEmotionBuffer(emotion)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenderComponent);

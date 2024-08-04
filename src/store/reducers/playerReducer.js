@@ -27,6 +27,11 @@ const playerReducer = (state = initialState, action) => {
         isPaused: true,
         pausedPosition: state.trackPosition
       };
+    case 'SET_EMOTION_BUFFER':
+      return {
+        ...state,
+        emotionBuffer: action.payload
+      };
     case 'SONG_ENDED':
       // console.log("SONG_ENDED action received in reducer");
       return {

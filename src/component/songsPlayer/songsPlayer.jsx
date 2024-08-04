@@ -13,6 +13,7 @@ import { playEmotionSong, songEnded, playSong, pauseSong, resumeSong, nextSong, 
 class SongsPlayer extends Component {
     toSeconds = (ms) => ms / 1000;
 
+
     handlePlayPause = () => {
         const { playing, pauseSong, resumeSong, pausedPosition, seekSong } = this.props;
         if (playing) {
@@ -50,7 +51,7 @@ class SongsPlayer extends Component {
         return (
             <div className="player-container">
                 <div className="player-left">
-                    <TrackCover />
+                    {/*<TrackCover />*/}
                     <DetailSection
                         ids={
                             currentSong.linked_from?.id
@@ -78,9 +79,9 @@ class SongsPlayer extends Component {
                         onChange={(value) => seekSong(Math.round(value * duration * 1000))}
                     />
                 </div>
-                <div className="player-right">
-                    <VolumeControl />
-                </div>
+                {/*<div className="content-end">*/}
+                {/*    <VolumeControl />*/}
+                {/*</div>*/}
             </div>
         );
     };

@@ -22,6 +22,7 @@ const PhotoTrackerAnalyzer = () => {
     const sourceRef = useRef(null);
     const sdkRef = useRef(null);
 
+
     const customSource = useCallback(() => {
         let crtImgData;
         let resolver;

@@ -43,8 +43,8 @@ class VolumeControl extends Component {
   };
 
   render = () => (
-      <div className="volume-control-container">
-        <Devices />
+      <div className="vol">
+        {/*<Devices />*/}
         <VolumeSider
             value={this.state.volume}
             onClick={this.onClick}

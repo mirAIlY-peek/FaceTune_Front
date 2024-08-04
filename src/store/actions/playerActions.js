@@ -10,17 +10,22 @@ export const setCurrentEmotion = emotion => ({
   emotion
 });
 
+export const setEmotionBuffer = (emotion) => ({
+  type: 'SET_EMOTION_BUFFER',
+  payload: emotion
+});
+
 export const playEmotionSong = (emotion) => async (dispatch, getState) => {
   try {
-    console.log(`Attempting to play song for emotion: ${emotion}`);
+    // console.log(`Attempting to play song for emotion: ${emotion}`);
     const state = getState();
     const allSongs = state.libraryReducer.songs.items;
-    console.log(`Total songs in library: ${allSongs.length}`);
+    // console.log(`Total songs in library: ${allSongs.length}`);
     const emotionSongs = allSongs.filter(song => song.emotion.toLowerCase() === emotion.toLowerCase());
-    console.log(`Songs matching emotion ${emotion}: ${emotionSongs.length}`);
+    // console.log(`Songs matching emotion ${emotion}: ${emotionSongs.length}`);
 
     if (emotionSongs.length === 0) {
-      console.log(`No songs found for emotion: ${emotion}`);
+      // console.log(`No songs found for emotion: ${emotion}`);
       return;
     }
 

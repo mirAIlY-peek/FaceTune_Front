@@ -3,7 +3,7 @@ import UserHeader from '../userDetails/userDetails';
 import './header.css';
 
 const Header = ({ username, img, onModeChange, toggleMenu }) => {
-    const [activeMode, setActiveMode] = useState('');
+    const [activeMode, setActiveMode] = useState('spotify');
 
     const handleModeChange = (mode) => {
         setActiveMode(mode);

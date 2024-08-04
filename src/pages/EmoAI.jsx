@@ -29,7 +29,7 @@
     import { fetchSongs } from '../store/actions/libraryActions';
     // import Tooltips from "../components/Tooltips.jsx";
 
-    const EmoAI = ({setToken, fetchUser ,fetchSongs }) => {
+    const EmoAI = ({setToken, fetchUser ,fetchSongs,emotionBuffer  }) => {
         const [user, setUser] = useState({ display_name: '', images: [] });
 
 
@@ -55,14 +55,22 @@
 
         const [selectedMode, setSelectedMode] = useState('photo');
 
-        const [activeMode, setActiveMode] = useState('');
+        const [activeMode, setActiveMode] = useState('spotify');
 
         const [shouldPlaySpotify, setShouldPlaySpotify] = useState(false);
 
         const [currentEmotion, setCurrentEmotion] = useState(null);
 
+        const [isCameraActive, setIsCameraActive] = useState(false);
 
+        const [buttonText, setButtonText] = useState('Connect Spotify');
 
+        useEffect(() => {
+            const accessToken = localStorage.getItem('spotify_access_token');
+            if (accessToken) {
+                setButtonText('Generate Music');
+            }
+        }, []);
 
         const handleModeChange = (mode) => {
             setActiveMode(mode);
@@ -99,20 +107,42 @@
 
         const toggleMode = (mode) => {
             setSelectedMode(mode);
+            if (mode === 'photo') {
+                closeCamera();
+            }
         };
 
         const steps = [
             {
                 target: '.current-emotion-section',
-                content: 'Current detected emotion',
+                content: 'Здесь будет показываться ваша эмоция',
                 placement: 'right',
             },
             {
                 target: '.recommended-music-section',
-                content: 'Recommended music based on emotion',
+                content: 'Рекомендованная музыка',
                 placement: 'right',
             },
-            // Добавьте другие шаги по необходимости
+            {
+                target: '.recommended-music-control-section',
+                content: 'Здесь будет плеер с Spotify и музыка',
+                placement: 'right',
+            },
+            {
+                target: '.header-music-switcher-section',
+                content: 'Можете выбрать функцию через что будем использовать генерацию музыка',
+                placement: 'left',
+            },
+            {
+                target: '.connect-music-section',
+                content: 'Кнопка для генерации музыка',
+                placement: 'right',
+            },
+            {
+                target: '.main-emotion-switcher-section',
+                content: 'Смена режима',
+                placement: 'left',
+            },
         ];
 
         useEffect(() => {
@@ -216,29 +246,28 @@
         };
 
         const CreateButtonSpotify = ({ onClick }) => (
-            <div className="w-full  mt-4">
+            <div className="w-full mt-4">
                 <button
                     aria-label="Create"
                     className="w-full font-sans text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out shadow-lg buttonAnimate hover:opacity-90 flex items-center justify-center"
                     onClick={onClick}
                 >
                     <style jsx="true">{`
-                    @keyframes randomBackground {
+                      @keyframes randomBackground {
                         0% { background-position: 50% 50%; }
                         25% { background-position: 30% 70%; }
                         50% { background-position: 70% 30%; }
                         75% { background-position: 40% 60%; }
                         100% { background-position: 50% 50%; }
-                    }
-                    .buttonAnimate {
+                      }
+                      .buttonAnimate {
                         position: relative;
                         background-image: url('/download 1.svg');
-                        //background-size: 200% 200%;
                         background-position: 50% 50%;
                         transition: background 0.5s ease-in-out;
                         overflow: hidden;
-                    }
-                    .buttonAnimate::before {
+                      }
+                      .buttonAnimate::before {
                         content: '';
                         position: absolute;
                         top: 0;
@@ -251,13 +280,13 @@
                         opacity: 0.5;
                         z-index: 1;
                         pointer-events: none;
-                    }
-                    .buttonAnimate:hover {
+                      }
+                      .buttonAnimate:hover {
                         animation: randomBackground 3s linear infinite;
-                    }
-                `}</style>
+                      }
+                    `}</style>
                     <img src="/create-new.svg" alt="icon" className="w-4 h-4 mr-2 filter invert brightness-0" />
-                    <span>Connect Spotify</span>
+                    <span>{buttonText}</span>
                 </button>
             </div>
         )
@@ -312,10 +341,12 @@
         const handleSubmit = async () => {
             try {
                 setIsLoading(true);
+
                 const sunoApiResponse = await axios.post('https://facetune-back.onrender.com/api/generate', {
-                    prompt: "Create super sad music capturing the pain and sadness of a breakup. Slow tempo, melancholic melody, piano, strings, soft vocals. Mood: loneliness, sorrow, reflection.\n",
+                    prompt: `Сгенерируй случайную музыку для эмоции:\n ${emotionBuffer}`,
                     wait_audio: true
                 });
+
                 const data = sunoApiResponse.data;
                 console.log('SunoApi Response:', data);
                 setGeneratedAudio(data);
@@ -375,6 +406,17 @@
 
         const handleAccessWebcam = () => {
             setAccessWebcam(true);
+            setIsCameraActive(true);
+        };
+
+        const closeCamera = () => {
+            if (videoEl.current && videoEl.current.srcObject) {
+                const tracks = videoEl.current.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                videoEl.current.srcObject = null;
+            }
+            setAccessWebcam(false);
+            setIsCameraActive(false);
         };
 
 
@@ -389,6 +431,13 @@
                     showSkipButton={true}
                     showProgress={false}
                     styles={{
+                        beaconInner:{
+                            backgroundColor: '#ffffff',
+                        },
+                        beaconOuter:{
+                            borderColor: '#ffffff'
+                        },
+
                         options: {
                             arrowColor: '#fff',
                             backgroundColor: '#fff',
@@ -399,6 +448,7 @@
                             zIndex: 1000,
                         },
                         tooltip: {
+                            backgroundColor: 'white',
                             fontSize: '12px',
                         },
                         buttonNext: {
@@ -437,7 +487,7 @@
                             {isLoading && <Loader/>}
 
                             <div className="space-y-6">
-                                <div className="bg-EmoButton p-4 rounded-lg">
+                                <div className="bg-EmoButton p-4 rounded-lg current-emotion-section">
                                     <div className="flex items-center mb-2">
                                         {/*<FaSmileBeam className="text-yellow-500 text-2xl mr-2" />*/}
                                         <h2 className="text-lg font-bold">Current Emotion</h2>
@@ -448,11 +498,13 @@
                                         <p className="text-gray-400 text-x">Your emotion will appear here</p>
                                     )}
                                 </div>
-                                <div className="bg-EmoButton p-4 rounded-lg">
+                                <div className="bg-EmoButton p-4 rounded-lg recommended-music-section">
                                     <div className="flex items-center mb-2">
                                         {/*<FaMusic className="text-purple-500 text-2xl mr-2" />*/}
                                         <h2 className="text-lg font-bold">Recommended Music</h2>
                                     </div>
+                                        <TrackCover/>
+
                                     {generatedAudio.length > 0 ? (
                                         <div className="flex items-center space-x-2">
                                             {generatedAudio[0].image_url && (
@@ -471,13 +523,13 @@
                                 </div>
                             </div>
                         </div>
-
-                        {activeMode === 'spotify' && <CreateButtonSpotify onClick={handleCreateButtonClick} />}
-                        {activeMode === 'generate' && <CreateButtonGenerate onClick={handleCreateButtonClick} />}
-
+                        <div className="connect-music-section">
+                            {activeMode === 'spotify' && <CreateButtonSpotify onClick={handleCreateButtonClick} />}
+                            {activeMode === 'generate' && <CreateButtonGenerate onClick={handleCreateButtonClick} />}
+                        </div>
                         <div className="mt-auto pt-6">
                             <h2 className="text-lg font-bold mb-2">Music Controls</h2>
-                            <div className="music-player bg-EmoButton p-4 rounded-lg">
+                            <div className="music-player bg-EmoButton p-4 rounded-lg  recommended-music-control-section">
                                 <SongsPlayer />
                             </div>
                         </div>
@@ -491,12 +543,14 @@
 
 
                     <div className={`transition-all duration-300 lg:col-span-3 flex flex-col ${isMenuOpen ? "ml-0" : "ml-auto"} ${isMenuOpen ? "w-full" : "lg:w-3/4"} ${!isMenuOpen && "lg:ml-0 lg:w-full"}`}>
+                      <div className="header-music-switcher-section">
                         <Header
                             username={user.display_name || 'User'}
                             img={user.images[0]?.url || '/Spotify_Icon_RGB_Green.png'}
                             onModeChange={handleModeChange}  // Pass the handleModeChange function here
                             toggleMenu={toggleMenu}
                         />
+                      </div>
 
 
 
@@ -515,7 +569,7 @@
                                     Choose to upload a photo or use your webcam for real-time emotion analysis.
                                 </p>
 
-                                <div className="flex space-x-4 mb-6">
+                                <div className="flex space-x-4 mb-6 main-emotion-switcher-section">
                                     <button
                                         className={`bg-EmoButton px-6 py-2 rounded-full transition-colors ${selectedMode === 'photo' ? 'bg-purple-600' : ''}`}
                                         onClick={() => toggleMode('photo')}
@@ -534,16 +588,7 @@
                                     <PhotoTrackerAnalyzer />
                                 ) : (
                                     <div className="w-full max-w-6xl">
-                                        {!accessWebcam ? (
-                                            <div className="relative w-full h-64 mb-4">
-                                                <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
-                                                        Access WebCam
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
+                                        {selectedMode === 'webcam' && isCameraActive ? (
                                             <div className="flex flex-col justify-center md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
                                                 <div className="w-full md:w-2/4">
                                                     <div className="video-container w-full h-64 md:h-80 rounded-lg overflow-hidden">
@@ -567,6 +612,15 @@
 
                                                 <div className="w-full md:w-1/3 place-content-center">
                                                     <EmotionBarsComponent currentEmotion={currentEmotion}></EmotionBarsComponent>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="relative w-full h-64 mb-4">
+                                                <img src="/faceToEmo1.png" alt="Face Outline" className="w-full h-full object-contain"/>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <button className="bg-EmoButton p-2 rounded-lg" onClick={handleAccessWebcam}>
+                                                        Access WebCam
+                                                    </button>
                                                 </div>
                                             </div>
                                         )}
