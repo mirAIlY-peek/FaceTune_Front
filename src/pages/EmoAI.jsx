@@ -343,7 +343,7 @@
                 setIsLoading(true);
 
                 const sunoApiResponse = await axios.post('https://facetune-back.onrender.com/api/generate', {
-                    prompt: `Сгенерируй случайную музыку для эмоции:\n ${emotionBuffer}`,
+                    prompt: `give the saddest music with the rain on the background with sad lyrics`,
                     wait_audio: true
                 });
 
@@ -373,7 +373,6 @@
                     await start();
                 }
             }
-
             getAiSdk();
         }, [aiSdkState, mphToolsState, accessWebcam]);
 
@@ -382,7 +381,6 @@
                 const emotions = evt.detail.output.emotion;
                 handleEmotionUpdate(emotions);
             };
-
             if (accessWebcam) {
                 window.addEventListener("CY_FACE_EMOTION_RESULT", emotionUpdateHandler);
             }
@@ -649,6 +647,7 @@
                                 )}
                             </WebPlaybackReact>
                         )}
+
                     </div>
                 </div>
             </>
