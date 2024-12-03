@@ -12,7 +12,7 @@
     transform: translateX(-50%);
     left: 50%;
   }
-  
+
   .progress-bar-indicator {
     width: 9px;
     position: absolute;
@@ -33,36 +33,36 @@
     right: 0;
     bottom: 0;
   }
-  
+
   #barContainer {
     height: 100%;
     width: 57px;
-  
+
     top: 0;
   }
   .barName {
     font-style: normal;
-  
+
     font-weight: 200;
     font-size: 14px;
     line-height: 15px;
     text-align: center;
     letter-spacing: -0.04em;
-  
+
     color: white;
   }
-  
+
   @media only screen and (max-width: 767px) {
     #barContainer {
       height: 100%;
       width: 50px;
-  
+
       top: 0;
     }
     .barName {
       font-weight: 200;
       font-size: 12.5px;
-  
+
       color: #f9f9f9;
     }
   }

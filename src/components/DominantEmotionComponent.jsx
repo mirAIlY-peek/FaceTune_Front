@@ -1,45 +1,72 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { connect } from 'react-redux';
+import {
+  playEmotionSong,
+  songEnded,
+  setCurrentEmotion,
+  updateCurrentEmotion,
+  playSong,
+  pauseSong,
+  resumeSong,
+    setEmotionBuffer
+} from '../store/actions/playerActions.js';
 
-const musicMap = {
-  Happy: "/music/One.mp3",
-  Sad: "/music/XXXTENTACION - sad.mp3",
-  Surprise: "/music/Weekend-Happy.mp3",
-  Neutral: "/music/idea10-neutral.mp3",
-  Angry: "/music/MeadnDevil-Fear.mp3",
-  Disgust: "/music/Eminem - Mockingbird.mp3"
-};
-
-const GenderComponent = () => {
-  const [dominantEmotion, setDominantEmotion] = useState("");
+const GenderComponent = ({
+                           playEmotionSong,
+                           songEnded,
+                           setCurrentEmotion,
+                           playing,
+                           currentEmotion,
+                           updateCurrentEmotion,
+                           isPaused,
+                           pauseSong,
+                           resumeSong
+                         }) => {
   const [emotionBuffer, setEmotionBuffer] = useState("");
-  const [audioSource, setAudioSource] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false); // Состояние для отслеживания воспроизведения
-  const [isPaused, setIsPaused] = useState(false); // Состояние для отслеживания паузы
+  const [lastEmotionChangeTime, setLastEmotionChangeTime] = useState(Date.now());
 
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    if (!isPaused) {
+    if (!isPaused && !playing) {
       bindEvents();
       intervalRef.current = setInterval(() => {
-        // console.log("Updating dominantEmotion and audioSource");
-        // Обновляем только если emotionBuffer отличается от текущей dominantEmotion
-        if (dominantEmotion !== emotionBuffer) {
-          setDominantEmotion(emotionBuffer);
-          setAudioSource(musicMap[emotionBuffer] || musicMap["Neutral"]);
+        if (emotionBuffer && emotionBuffer !== currentEmotion) {
+          setCurrentEmotion(emotionBuffer);
+          playEmotionSong(emotionBuffer);
         }
-      }, 3000);
+      }, 1000); // Check every second
+    } else {
+      clearInterval(intervalRef.current);
+      window.removeEventListener("CY_FACE_EMOTION_RESULT", handleEmotionEvent);
     }
 
     return () => {
       clearInterval(intervalRef.current);
       window.removeEventListener("CY_FACE_EMOTION_RESULT", handleEmotionEvent);
     };
-  }, [emotionBuffer, dominantEmotion, isPaused]);
+  }, [emotionBuffer, currentEmotion, isPaused, playing, playEmotionSong, setCurrentEmotion]);
+
+  useEffect(() => {
+    if (!playing && !isPaused) {
+      songEnded();
+    }
+  }, [playing, isPaused, songEnded]);
+
+    useEffect(() => {
+        if (emotionBuffer) {
+            setEmotionBuffer(emotionBuffer); // Update Redux state when emotionBuffer changes
+        }
+    }, [emotionBuffer, setEmotionBuffer]);
 
   const handleEmotionEvent = (evt) => {
-    if (!isPaused) {
-      setEmotionBuffer(evt.detail.output.dominantEmotion || "Neutral");
+    if (!isPaused && !playing) {
+      const newEmotion = evt.detail.output.dominantEmotion || "Neutral";
+      const currentTime = Date.now();
+      if (currentTime - lastEmotionChangeTime > 30000) { // 30 seconds cooldown
+        setEmotionBuffer(newEmotion);
+        setLastEmotionChangeTime(currentTime);
+      }
     }
   };
 
@@ -47,40 +74,42 @@ const GenderComponent = () => {
     window.addEventListener("CY_FACE_EMOTION_RESULT", handleEmotionEvent);
   }
 
-  useEffect(() => {
-    if (audioSource) {
-      const audio = document.getElementById("backgroundAudio");
-      audio.load();
-      audio.play();
-      setIsPlaying(true);
-    }
-  }, [audioSource]);
-
-  const handlePlayPause = () => {
-    const audio = document.getElementById("backgroundAudio");
-    if (isPlaying) {
-      audio.pause();
-      setIsPaused(true);
+  const handlePauseResume = () => {
+    if (playing) {
+      pauseSong();
     } else {
-      audio.play();
-      setIsPaused(false);
+      resumeSong();
     }
-    setIsPlaying(!isPlaying);
   };
 
   return (
       <div>
         <p style={{ fontSize: "20px" }}>DominantEmotion Component:</p>
-        <p>{dominantEmotion}</p>
-        <button onClick={handlePlayPause}>
-          {isPlaying ? "Pause" : "Play"}
+        <p>Current Emotion: {emotionBuffer}</p>
+        <p>Dominant Emotion (used for music): {currentEmotion}</p>
+        <p>Emotion Detection: {isPaused || playing ? "Frozen" : "Active"}</p>
+        <p>Music Playing: {playing ? "Yes" : "No"}</p>
+        <button onClick={handlePauseResume}>
+          {playing ? "Pause" : "Resume"} Music and Emotion Detection
         </button>
-        <audio id="backgroundAudio" loop>
-          <source src={audioSource} type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
       </div>
   );
 };
 
-export default GenderComponent;
+const mapStateToProps = (state) => ({
+  playing: state.playerReducer.playing,
+  currentEmotion: state.playerReducer.currentEmotion,
+  isPaused: state.playerReducer.isPaused,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  playEmotionSong: (emotion) => dispatch(playEmotionSong(emotion)),
+  songEnded: () => dispatch(songEnded()),
+  setCurrentEmotion: (emotion) => dispatch(setCurrentEmotion(emotion)),
+  updateCurrentEmotion: (emotion) => dispatch(updateCurrentEmotion(emotion)),
+  pauseSong: () => dispatch(pauseSong()),
+  resumeSong: () => dispatch(resumeSong()),
+    setEmotionBuffer: (emotion) => dispatch(setEmotionBuffer(emotion)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(GenderComponent);
