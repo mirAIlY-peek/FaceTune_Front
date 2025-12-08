@@ -11,13 +11,14 @@
 }
 
 body {
+  overflow: auto;
   background-image: url('/phon.png');
   background-size: contain;
   background-repeat: no-repeat;
-  background-color: rgb(2 0 5);
+  background-color: rgb(2, 0, 5);
 }
 .bg-emo{
-  background-color: #171717;
+  background-color: #121212;
 }
 .bg-emoR{
   background-color: #000000;

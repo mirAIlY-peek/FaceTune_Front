@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "./componentCSS/emotionBarsComponent.css"
 import SingleBarComponent from "./SingleBarComponent";
 import DominantEmotionComponent from "./DominantEmotionComponent.jsx";
+import MoodComponent from "./MoodComponent.jsx";
 
 
 const EmotionBarsComponent = () => {
@@ -63,7 +64,10 @@ const EmotionBarsComponent = () => {
                 <SingleBarComponent name="Surprise" color1="#F5B9C3" color2="#664E98" value = {surprise}></SingleBarComponent>
                 <SingleBarComponent name="Neutral" color1="#A9A9A9" color2="#737373" value = {neutral}></SingleBarComponent>
             </div>
-            <DominantEmotionComponent/>
+            {/*<MoodComponent/>*/}
+            {/*<div className="hidden">*/}
+                <DominantEmotionComponent/>
+            {/*</div>*/}
         </>
 
     );

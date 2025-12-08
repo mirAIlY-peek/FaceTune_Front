@@ -9,7 +9,7 @@ const Hero = () => {
     let navigate = useNavigate();
 
     const handlePricingClick = () => {
-        navigate("/pricing");
+        navigate("/main");
     };
 
     const handleRegistrationClick = () => {
@@ -36,11 +36,11 @@ const Hero = () => {
                     {/*    Register*/}
                     {/*</Button>*/}
                     <div className="button-container mt-8 justify-center">
-                        <a className="framer-button primary-button button-animate" onClick={handleRegistrationClick}>
-                            <div className="label-wrap">
-                                <p className="button-text" data-text="Join Waitlist">Join Waitlist</p>
-                            </div>
-                        </a>
+                        {/*<a className="framer-button primary-button button-animate" onClick={handleRegistrationClick}>*/}
+                        {/*    <div className="label-wrap">*/}
+                        {/*        <p className="button-text" data-text="Join Waitlist">Join Waitlist</p>*/}
+                        {/*    </div>*/}
+                        {/*</a>*/}
                         <a className="framer-button ghost-button button-animate" onClick={handlePricingClick}>
                             <div className="label-wrap">
                                 <p className="button-text" data-text="Join Community">Join Community</p>

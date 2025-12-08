@@ -7,11 +7,18 @@
       type="image/png+xml"
       href="/logo_withoutName.png"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>FaceTune.ai</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./src/main.jsx"></script>
+    <script type="module" src="src/index.jsx"></script>
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+  <script>
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      window.Spotify = Spotify;
+    }
+  </script>
   </body>
 </html>
